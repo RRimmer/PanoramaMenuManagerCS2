@@ -1,1 +1,112 @@
 # PanoramaMenuManagerCS2
+
+Форк [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) от **E!N**. Эта сборка продолжает форк [Stimayk](https://github.com/Stimayk/MenuManagerCS2).
+
+Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **E!N**. This build continues the [Stimayk](https://github.com/Stimayk/MenuManagerCS2) fork.
+
+Панорамное меню для Counter-Strike 2: кликабельный диалог, слайдеры, выпадающие списки и уведомления. Другие плагины открывают меню через `MenuManagerApi`.
+
+A panorama menu for Counter-Strike 2: a clickable dialog, switches, dropdowns and toasts. Other plugins open menus through `MenuManagerApi`.
+
+Текущая версия плагина: **v1.1.10**.  
+Current plugin version: **v1.1.10**.
+
+## Сайт конструктора
+
+Это наш сайт. Его сделал **E!N** для этого форка: живой конструктор внешнего вида, справочник API и список изменений. Оригинальный MenuManager такого сайта не даёт.
+
+**[genesis-cs.space/menuconstructor](https://genesis-cs.space/menuconstructor/index.html)**
+
+- [Конструктор](https://genesis-cs.space/menuconstructor/index.html) — цвета, размеры, слайдеры и выпадающий список. Сразу видно меню и можно скачать свою панораму: `ui.css` и `menu_ui.xml`.
+- [API](https://genesis-cs.space/menuconstructor/menumanager/api/index.html) — как плагину открыть меню, слайдер, список и тост. С примерами на C#.
+- [Список изменений](https://genesis-cs.space/menuconstructor/menumanager/changelog/index.html) — ядро, сайт и панорама.
+
+## Constructor site
+
+This site is ours. **E!N** built it for this fork: a live look editor, an API reference and a changelog. The original MenuManager does not ship this site.
+
+**[genesis-cs.space/menuconstructor](https://genesis-cs.space/menuconstructor/index.html)**
+
+- [Constructor](https://genesis-cs.space/menuconstructor/index.html) — colors, sizes, switches and the dropdown. The menu updates as you edit, and you can download your panorama: `ui.css` and `menu_ui.xml`.
+- [API](https://genesis-cs.space/menuconstructor/menumanager/api/index.html) — how a plugin opens a menu, a switch, a list and a toast. With C# examples.
+- [Changelog](https://genesis-cs.space/menuconstructor/menumanager/changelog/index.html) — core, site and panorama.
+
+## Что лежит в репозитории
+
+| Папка | Зачем |
+| --- | --- |
+| `MenuManagerCore` | Плагин сервера |
+| `MenuManagerApi` | Библиотека для чужих плагинов |
+| `MenuManagerTest` | Короткий пример |
+| `custom_menu` | Клиентская панорама: `menu_ui.xml` и `ui.css` |
+
+Готовый архив для сервера в git не входит. Его нужно прикрепить к [Release](https://github.com/RRimmer/PanoramaMenuManagerCS2/releases) вручную.
+
+## Repository layout
+
+| Folder | What it is |
+| --- | --- |
+| `MenuManagerCore` | The server plugin |
+| `MenuManagerApi` | The library other plugins call |
+| `MenuManagerTest` | A short example |
+| `custom_menu` | The client panorama: `menu_ui.xml` and `ui.css` |
+
+The player-ready archive is not stored in git. Attach it to a [Release](https://github.com/RRimmer/PanoramaMenuManagerCS2/releases) yourself.
+
+## Установка с Release
+
+В архиве две папки.
+
+`Server-plugins` копируется в `game/csgo/addons/`. Получится:
+
+- `addons/counterstrikesharp/plugins/MenuManagerCore/`
+- `addons/counterstrikesharp/shared/MenuManagerApi/`
+- `addons/counterstrikesharp/configs/plugins/MenuManagerCore/MenuManagerCore.json`
+
+`MenuManagerApi.dll` должна быть только в `shared/MenuManagerApi/`. Копии в `plugins/MenuManagerCore`, `plugins/IksAdmin` и `plugins/VIPCore` ломают меню. После замены DLL нужен полный перезапуск сервера. `css_plugins reload` старую сборку не выгружает.
+
+`Content-addonmanager` копируется в корень клиентского аддона MultiAddonManager, не россыпью на dedicated server. После замены панорамы игрок заходит на сервер заново.
+
+В конфиге оставь `"DefaultMenu": "PanoramaMenu"`. Уведомления включены полем `"Notifications": true`. Игрок с типом Панорама меняет их себе в `!menu`.
+
+## Install from a Release
+
+The archive has two folders.
+
+Copy `Server-plugins` into `game/csgo/addons/`. You get:
+
+- `addons/counterstrikesharp/plugins/MenuManagerCore/`
+- `addons/counterstrikesharp/shared/MenuManagerApi/`
+- `addons/counterstrikesharp/configs/plugins/MenuManagerCore/MenuManagerCore.json`
+
+Keep `MenuManagerApi.dll` only in `shared/MenuManagerApi/`. Copies in `plugins/MenuManagerCore`, `plugins/IksAdmin` and `plugins/VIPCore` break menus. After replacing a DLL, restart the server. `css_plugins reload` does not unload the old assembly.
+
+Copy `Content-addonmanager` into the root of the MultiAddonManager client addon. Do not drop the files loose on the dedicated server. After a panorama update the player has to rejoin.
+
+Keep `"DefaultMenu": "PanoramaMenu"` in the config. Notifications stay on with `"Notifications": true`. A player on Panorama changes them for themselves in `!menu`.
+
+## Сборка
+
+Нужен .NET 10 SDK и пакет CounterStrikeSharp.API.
+
+```bash
+dotnet build MenuManager.sln --configuration Release
+```
+
+`MenuManagerApi.dll` кладётся в `shared/MenuManagerApi/`. В папку плагина её не копируй.
+
+## Build
+
+You need the .NET 10 SDK and the CounterStrikeSharp.API package.
+
+```bash
+dotnet build MenuManager.sln --configuration Release
+```
+
+Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the plugin folder.
+
+## Лицензия / License
+
+[GNU GPL v3](LICENSE). Форк сохраняет свободу оригинала [Nick Fox](https://github.com/NickFox007/MenuManagerCS2).
+
+[GNU GPL v3](LICENSE). The fork keeps the freedoms of the original by [Nick Fox](https://github.com/NickFox007/MenuManagerCS2).
