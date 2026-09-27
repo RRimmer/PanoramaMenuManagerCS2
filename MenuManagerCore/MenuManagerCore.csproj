@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CounterStrikeSharp.API" Version="*"/>
+        <PackageReference Include="Dapper" Version="*"/>
+        <PackageReference Include="MySqlConnector" Version="*"/>
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="*"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MenuManagerApi\MenuManagerApi.csproj"/>
+        <None Update="lang\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <Target Name="CopyLinuxSqliteNativeLibrary" AfterTargets="Build">
+        <ItemGroup>
+            <LinuxSqliteNativeLibrary Include="$(OutDir)runtimes/linux-x64/native/libe_sqlite3.so"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(LinuxSqliteNativeLibrary)"
+              DestinationFiles="$(OutDir)libe_sqlite3.so"
+              SkipUnchangedFiles="true"
+              Condition="Exists('%(LinuxSqliteNativeLibrary.Identity)')"/>
+    </Target>
+
+</Project>
