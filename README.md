@@ -6,7 +6,7 @@ Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **E!N*
 
 A panorama menu for Counter-Strike 2: a clickable dialog, switches, dropdowns and toasts. Other plugins open menus through `MenuManagerApi`.
 
-Current plugin version: **v1.1.10**.
+Current plugin version: ![Version](https://img.shields.io/github/v/release/RRimmer/PanoramaMenuManagerCS2?label=version&color=blue)
 
 ## Constructor site
 
@@ -67,7 +67,7 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 
 Панорамное меню для Counter-Strike 2: кликабельный диалог, слайдеры, выпадающие списки и уведомления. Другие плагины открывают меню через `MenuManagerApi`.
 
-Текущая версия плагина: **v1.1.10**.
+Текущая версия плагина: ![Version](https://img.shields.io/github/v/release/RRimmer/PanoramaMenuManagerCS2?label=version&color=blue)
 
 ## Сайт конструктора
 
