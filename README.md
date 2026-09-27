@@ -1,6 +1,6 @@
 # PanoramaMenuManagerCS2
 
-<h2><a href="https://genesis-cs.space/menuconstructor/index.html">Более подробная информация тут</a></h2>
+<h2><a href="https://genesis-cs.space/menuconstructor/index.html">>>>Более подробная информация на сайте<<<</a></h2>
 
 Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **E!N**. This build continues the [Stimayk](https://github.com/Stimayk/MenuManagerCS2) fork.
 
