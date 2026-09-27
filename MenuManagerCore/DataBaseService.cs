@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using MySqlConnector;
 using System.Collections.Concurrent;
 using System.Data;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace MenuManagerCore;
 
@@ -27,6 +29,7 @@ public class DataBaseService
             string.IsNullOrWhiteSpace(_config.DatabaseName))
         {
             _useSqlite = true;
+            PrepareSqliteNative(modulePath);
             SQLitePCL.Batteries.Init();
             string sqliteDbFile = Path.Combine(modulePath, "menumanager.db");
             _connectionString = $"Data Source={sqliteDbFile}";
@@ -37,6 +40,71 @@ public class DataBaseService
             _useSqlite = false;
             _connectionString = BuildMySqlConnectionString();
         }
+    }
+
+    private void PrepareSqliteNative(string modulePath)
+    {
+        string nativePath = ResolveSqliteNativePath(modulePath);
+        if (!File.Exists(nativePath))
+        {
+            _logger.LogError("SQLite native library was not found. Expected {Path}", nativePath);
+            return;
+        }
+
+        Assembly provider = typeof(SQLitePCL.SQLite3Provider_e_sqlite3).Assembly;
+        try
+        {
+            NativeLibrary.SetDllImportResolver(provider, (libraryName, _, _) =>
+            {
+                if (libraryName == "e_sqlite3")
+                {
+                    return NativeLibrary.Load(nativePath);
+                }
+
+                return IntPtr.Zero;
+            });
+        }
+        catch (InvalidOperationException)
+        {
+            _logger.LogInformation("SQLite native resolver is already set.");
+        }
+
+        _logger.LogInformation("SQLite native library: {Path}", nativePath);
+    }
+
+    private static string ResolveSqliteNativePath(string modulePath)
+    {
+        string rid;
+        string fileName;
+        if (OperatingSystem.IsWindows())
+        {
+            rid = "win-x64";
+            fileName = "e_sqlite3.dll";
+        }
+        else if (File.Exists("/lib/ld-musl-x86_64.so.1"))
+        {
+            rid = "linux-musl-x64";
+            fileName = "libe_sqlite3.so";
+        }
+        else
+        {
+            rid = "linux-x64";
+            fileName = "libe_sqlite3.so";
+        }
+
+        string runtimePath = Path.Combine(modulePath, "runtimes", rid, "native", fileName);
+        if (File.Exists(runtimePath))
+        {
+            return runtimePath;
+        }
+
+        string beside = Path.Combine(modulePath, fileName);
+        if (File.Exists(beside))
+        {
+            return beside;
+        }
+
+        return runtimePath;
     }
 
     private string BuildMySqlConnectionString()

@@ -41,6 +41,8 @@ Copy `Server-plugins` into `game/csgo/addons/`. You get:
 
 Keep `MenuManagerApi.dll` only in `shared/MenuManagerApi/`. Copies in `plugins/MenuManagerCore`, `plugins/IksAdmin` and `plugins/VIPCore` break menus. After replacing a DLL, restart the server. `css_plugins reload` does not unload the old assembly.
 
+From 1.1.11, leave `plugins/MenuManagerCore/runtimes` in place. SQLite loads `libe_sqlite3.so` or `e_sqlite3.dll` from that folder and writes `menumanager.db` next to the plugin.
+
 Copy `Content-addonmanager` into the root of the MultiAddonManager client addon. Do not drop the files loose on the dedicated server. After a panorama update the player has to rejoin.
 
 Keep `"DefaultMenu": "PanoramaMenu"` in the config. Notifications stay on with `"Notifications": true`. A player on Panorama changes them for themselves in `!menu`.
@@ -101,6 +103,8 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 - `addons/counterstrikesharp/configs/plugins/MenuManagerCore/MenuManagerCore.json`
 
 `MenuManagerApi.dll` должна быть только в `shared/MenuManagerApi/`. Копии в `plugins/MenuManagerCore`, `plugins/IksAdmin` и `plugins/VIPCore` ломают меню. После замены DLL нужен полный перезапуск сервера. `css_plugins reload` старую сборку не выгружает.
+
+С 1.1.11 папку `plugins/MenuManagerCore/runtimes` не удаляй. SQLite берёт оттуда `libe_sqlite3.so` или `e_sqlite3.dll` и пишет `menumanager.db` рядом с плагином.
 
 `Content-addonmanager` копируется в корень клиентского аддона MultiAddonManager, не россыпью на dedicated server. После замены панорамы игрок заходит на сервер заново.
 

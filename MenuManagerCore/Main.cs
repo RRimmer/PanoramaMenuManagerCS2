@@ -51,8 +51,8 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
     private CMenuApi? _api;
     private CCSGameRulesProxy? _gameRulesProxy;
     public override string ModuleName => "[FORK] MenuManager";
-    public override string ModuleVersion => "v1.1.10";
-    public override string ModuleAuthor => "E!N (base by Nick Fox)";
+    public override string ModuleVersion => "v1.1.11";
+    public override string ModuleAuthor => "Rimmer (base by Nick Fox)";
     public override string ModuleDescription => "";
     public required PluginConfig Config { get; set; }
 
