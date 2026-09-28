@@ -49,5 +49,7 @@ public enum MenuType
     CenterMenu = 2,
     ButtonMenu = 3,
     MetamodMenu = 4,
-    PanoramaMenu = 5
+    PanoramaMenu = 5,
+    PanoramaWasdMenu = 6,
+    CsgoMenu = 7
 }

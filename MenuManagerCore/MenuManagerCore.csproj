@@ -21,14 +21,18 @@
         <None Update="lang\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <Target Name="CopyLinuxSqliteNativeLibrary" AfterTargets="Build">
+    <Target Name="CopySqliteNativeRuntimes" AfterTargets="Build">
         <ItemGroup>
-            <LinuxSqliteNativeLibrary Include="$(OutDir)runtimes/linux-x64/native/libe_sqlite3.so"/>
+            <SqliteLinux Include="$(NuGetPackageRoot)\sqlitepclraw.lib.e_sqlite3\*\runtimes\linux-x64\native\libe_sqlite3.so"/>
+            <SqliteMusl Include="$(NuGetPackageRoot)\sqlitepclraw.lib.e_sqlite3\*\runtimes\linux-musl-x64\native\libe_sqlite3.so"/>
+            <SqliteWin Include="$(NuGetPackageRoot)\sqlitepclraw.lib.e_sqlite3\*\runtimes\win-x64\native\e_sqlite3.dll"/>
         </ItemGroup>
-        <Copy SourceFiles="@(LinuxSqliteNativeLibrary)"
-              DestinationFiles="$(OutDir)libe_sqlite3.so"
-              SkipUnchangedFiles="true"
-              Condition="Exists('%(LinuxSqliteNativeLibrary.Identity)')"/>
+        <Message Importance="high" Text="SQLite linux: @(SqliteLinux->'%(Identity)', ', ')" />
+        <Copy SourceFiles="@(SqliteLinux)" DestinationFolder="$(OutDir)runtimes\linux-x64\native\" SkipUnchangedFiles="true"/>
+        <Copy SourceFiles="@(SqliteMusl)" DestinationFolder="$(OutDir)runtimes\linux-musl-x64\native\" SkipUnchangedFiles="true"/>
+        <Copy SourceFiles="@(SqliteWin)" DestinationFolder="$(OutDir)runtimes\win-x64\native\" SkipUnchangedFiles="true"/>
+        <Copy SourceFiles="@(SqliteLinux)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"/>
+        <Copy SourceFiles="@(SqliteWin)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"/>
     </Target>
 
 </Project>

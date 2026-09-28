@@ -2,6 +2,8 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.Menu;
+using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
 using MenuManager;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
@@ -29,6 +31,8 @@ public class PluginConfig : BasePluginConfig
     [JsonPropertyName("Pagination")] public bool Pagination { get; set; } = false;
     [JsonPropertyName("SoundVolume")] public float SoundVolume { get; set; } = 0.25f;
     [JsonPropertyName("Notifications")] public bool Notifications { get; set; } = true;
+    [JsonPropertyName("PanoramaPosition")] public string PanoramaPosition { get; set; } = "";
+    [JsonPropertyName("PisexMenusBridge")] public bool PisexMenusBridge { get; set; } = true;
     [JsonPropertyName("SoundScroll")] public string SoundScroll { get; set; } = "UI.StickerSelect";
     [JsonPropertyName("SoundClick")] public string SoundClick { get; set; } = "UI.StickerApply";
     [JsonPropertyName("SoundDisabled")] public string SoundDisabled { get; set; } = "Instructor.ImportantLessonStart";
@@ -51,8 +55,8 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
     private CMenuApi? _api;
     private CCSGameRulesProxy? _gameRulesProxy;
     public override string ModuleName => "[FORK] MenuManager";
-    public override string ModuleVersion => "v1.1.10";
-    public override string ModuleAuthor => "E!N (base by Nick Fox)";
+    public override string ModuleVersion => "v1.2.00";
+    public override string ModuleAuthor => "Rimmer (base by Nick Fox)";
     public override string ModuleDescription => "";
     public required PluginConfig Config { get; set; }
 
@@ -84,13 +88,19 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
 
         Control.Init(this);
         RegisterListener<OnTick>(Control.OnPluginTick);
+        RegisterListener<OnTick>(PanoramaHud.OnTick);
+        CsgoMenu.Register(this);
+        RegisterEventHandler<EventPlayerDeath>(OnPlayerDeath);
+        RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam);
         RegisterListener<OnMapStart>(OnMapStart);
         RegisterListener<OnCustomHudClicked>(PanoramaHud.OnClick);
+        AddTimer(3.0f, PisexLayout.Sync, TimerFlags.REPEAT);
         RegisterEventHandler<EventPlayerDisconnect>((@event, _) =>
         {
             if (@event.Userid != null)
             {
                 PanoramaHud.Close(eventPlayer: @event.Userid);
+                CsgoMenu.Close(@event.Userid);
                 if (Config.UseMetamodMenu)
                 {
                     MenusMm.ClearCallbackInfo(@event.Userid.Slot);
@@ -109,6 +119,51 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
         }
     }
 
+    private HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo _)
+    {
+        CCSPlayerController? player = @event.Userid;
+        if (player != null)
+        {
+            RemindCsgo(player, true);
+        }
+
+        return HookResult.Continue;
+    }
+
+    private HookResult OnPlayerTeam(EventPlayerTeam @event, GameEventInfo _)
+    {
+        CCSPlayerController? player = @event.Userid;
+        if (player != null && !@event.Disconnect &&
+            @event.Team == (int)CsTeam.Spectator &&
+            @event.Oldteam != (int)CsTeam.Spectator)
+        {
+            RemindCsgo(player, false);
+        }
+
+        return HookResult.Continue;
+    }
+
+    private void RemindCsgo(CCSPlayerController player, bool died)
+    {
+        if (!player.IsValid || player.IsBot || player.Connected != PlayerConnectedState.Connected)
+        {
+            return;
+        }
+
+        if (Misc.GetCurrentPlayerMenu(player) != MenuType.CsgoMenu || !Misc.GetCsgoDeadHint(player))
+        {
+            return;
+        }
+
+        PrintTagged(player, Localizer[died ? "menumanager.csgo_died" : "menumanager.csgo_spec"]);
+        PrintTagged(player, Localizer["menumanager.csgo_hint_off"]);
+    }
+
+    private static void PrintTagged(CCSPlayerController player, string text)
+    {
+        player.PrintToChat($" {ChatColors.Red}[MENU] {ChatColors.Green}{text}");
+    }
+
     private void OnMapStart(string map)
     {
         if (Config.MenuFlashFix)
@@ -117,6 +172,8 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
         }
 
         PanoramaHud.Reset();
+        CsgoMenu.Reset();
+        PisexLayout.Reset();
         PanoramaHud.Warmup();
         MenusMm.Init();
     }
@@ -160,6 +217,7 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
     public override void Unload(bool hotReload)
     {
         Control.Clear();
+        PanoramaHud.ReleaseAll();
     }
 
     private void OnCommand(CCSPlayerController? player)
@@ -179,13 +237,21 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
         if (isButtonBased)
         {
             _ = menu.AddMenuOption(Localizer["menumanager.nav_mode"], (p, _) => OpenNavigationSettings(p));
+        }
 
+        if (isButtonBased || currentType == MenuType.PanoramaWasdMenu)
+        {
             _ = menu.AddMenuOption(Localizer["menumanager.sound_settings"], (p, _) => OpenSoundSettings(p));
         }
 
-        if (currentType == MenuType.PanoramaMenu)
+        if (currentType is MenuType.PanoramaMenu or MenuType.PanoramaWasdMenu)
         {
             _ = menu.AddMenuOption(Localizer["menumanager.panorama_settings"], (p, _) => OpenPanoramaSettings(p));
+        }
+
+        if (currentType == MenuType.CsgoMenu)
+        {
+            _ = menu.AddMenuOption(Localizer["menumanager.csgo_settings"], (p, _) => OpenCsgoSettings(p));
         }
 
         menu.Open(player);
@@ -200,10 +266,14 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
 
         IMenu menu = _api.GetMenu(Localizer["menumanager.select_type"], OnCommand);
 
-        _ = menu.AddMenuOption(Localizer["menumanager.console"], (p, _) => Misc.SelectPlayerMenu(p, MenuType.ConsoleMenu));
-        _ = menu.AddMenuOption(Localizer["menumanager.chat"], (p, _) => Misc.SelectPlayerMenu(p, MenuType.ChatMenu));
+        _ = menu.AddMenuOption(Localizer["menumanager.panorama_wasd"],
+            (p, _) => Misc.SelectPlayerMenu(p, MenuType.PanoramaWasdMenu));
+        _ = menu.AddMenuOption(Localizer["menumanager.panorama_mouse"],
+            (p, _) => Misc.SelectPlayerMenu(p, MenuType.PanoramaMenu));
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo"], (p, _) => OpenCsgoHelp(p));
         _ = menu.AddMenuOption(Localizer["menumanager.center"], (p, _) => Misc.SelectPlayerMenu(p, MenuType.CenterMenu));
         _ = menu.AddMenuOption(Localizer["menumanager.control"], (p, _) => Misc.SelectPlayerMenu(p, MenuType.ButtonMenu));
+        _ = menu.AddMenuOption(Localizer["menumanager.chat"], (p, _) => Misc.SelectPlayerMenu(p, MenuType.ChatMenu));
 
         if (Config is { UseMetamodMenu: true, UseMetamodMenuReplace: false })
         {
@@ -211,9 +281,111 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
                 (p, _) => Misc.SelectPlayerMenu(p, MenuType.MetamodMenu));
         }
 
-        _ = menu.AddMenuOption("Panorama", (p, _) => Misc.SelectPlayerMenu(p, MenuType.PanoramaMenu));
-
         menu.Open(player);
+    }
+
+    private void OpenCsgoHelp(CCSPlayerController player)
+    {
+        if (_api == null)
+        {
+            return;
+        }
+
+        IMenu menu = _api.GetMenu(Localizer["menumanager.csgo"], OpenMenuTypeSettings);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_read_chat"], (_, _) => { }, true);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_copy_console"], (_, _) => { }, true);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_bind_cmd"], (_, _) => { }, true);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_dead"], (_, _) => { }, true);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_chat_keys"], (_, _) => { }, true);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_next"], (p, _) => OpenCsgoConfirm(p));
+        menu.Open(player);
+        PrintBinds(player, true, true);
+    }
+
+    private void OpenCsgoConfirm(CCSPlayerController player)
+    {
+        if (_api == null)
+        {
+            return;
+        }
+
+        IMenu menu = _api.GetMenu(Localizer["menumanager.csgo"], OpenCsgoHelp);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_warn_dead"], (_, _) => { }, true);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_dead_chat"], (_, _) => { }, true);
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_binds_chat"], (p, _) => PrintBinds(p, true, false));
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_binds_console"], (p, _) => PrintBinds(p, false, true));
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_confirm"], (p, _) =>
+        {
+            Misc.SelectPlayerMenu(p, MenuType.CsgoMenu);
+            OnCommand(p);
+        });
+        menu.Open(player);
+    }
+
+    private void PrintBinds(CCSPlayerController player, bool chat, bool console)
+    {
+        const string bindAll =
+            "bind 1 \"slot1;css_1\"; bind 2 \"slot2;css_2\"; bind 3 \"slot3;css_3\"; bind 4 \"slot4;css_4\"; bind 5 \"slot5;css_5\"; bind 6 \"slot6;css_6\"; bind 7 \"slot7;css_7\"; bind 8 \"slot8;css_8\"; bind 9 \"slot9;css_9\"; bind 0 \"slot0;css_0\"";
+        string dead = Localizer["menumanager.csgo_chat_dead"];
+        string keys = Localizer["menumanager.csgo_chat_use"];
+        Server.NextFrame(() =>
+        {
+            if (!player.IsValid)
+            {
+                return;
+            }
+
+            if (chat)
+            {
+                PrintTagged(player, dead);
+                PrintTagged(player, keys);
+                player.PrintToChat($" {bindAll}");
+            }
+
+            if (console)
+            {
+                player.PrintToConsole(dead);
+                player.PrintToConsole(keys);
+                player.PrintToConsole(bindAll);
+            }
+        });
+    }
+
+    private void OpenCsgoSettings(CCSPlayerController player)
+    {
+        if (_api == null)
+        {
+            return;
+        }
+
+        IMenu menu = _api.GetMenu(Localizer["menumanager.csgo_settings"], OnCommand);
+        AddPositionSelect(player, menu, OpenCsgoSettings);
+        bool hint = Misc.GetCsgoDeadHint(player);
+        _ = _api.AddToggle(menu, Localizer["menumanager.csgo_hint"], hint, (p, _) =>
+        {
+            Misc.SetCsgoDeadHint(p, !Misc.GetCsgoDeadHint(p));
+            OpenCsgoSettings(p);
+        });
+        _ = menu.AddMenuOption(Localizer["menumanager.csgo_binds_chat"], (p, _) => PrintBinds(p, true, false));
+        menu.Open(player);
+    }
+
+    private void AddPositionSelect(CCSPlayerController player, IMenu menu, Action<CCSPlayerController> reopen)
+    {
+        string?[] positions = [null, "left", "center", "right"];
+        string[] labels =
+        [
+            Localizer["menumanager.position_default"], Localizer["menumanager.position_left"],
+            Localizer["menumanager.position_center"], Localizer["menumanager.position_right"]
+        ];
+        int current = Math.Max(0, Array.IndexOf(positions, Misc.GetOwnPosition(player)));
+        _ = _api!.AddSelect(menu, Localizer["menumanager.position"], labels[current], labels,
+            (p, _, index) =>
+            {
+                Misc.SetPlayerPosition(p, positions[index]);
+                PisexLayout.Refresh(p);
+                reopen(p);
+            });
     }
 
     private void OpenNavigationSettings(CCSPlayerController player)
@@ -263,36 +435,6 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
             OpenSoundSettings(p);
         });
 
-        if (areSoundsEnabled)
-        {
-            _ = menu.AddMenuOption(Localizer["menumanager.volume_settings"], (p, _) => OpenVolumeSettings(p));
-        }
-
-        menu.Open(player);
-    }
-
-    private void OpenVolumeSettings(CCSPlayerController player)
-    {
-        if (_api == null)
-        {
-            return;
-        }
-
-        float currentVol = Misc.GetPlayerVolume(player);
-        IMenu menu = _api.GetMenu($"{Localizer["menumanager.volume"]}: {currentVol:0.0}", OpenSoundSettings);
-
-        _ = menu.AddMenuOption(Localizer["menumanager.volume_up"], (p, _) =>
-        {
-            Misc.SetPlayerVolume(p, currentVol + 0.1f);
-            OpenVolumeSettings(p);
-        }, currentVol >= 0.9f);
-
-        _ = menu.AddMenuOption(Localizer["menumanager.volume_down"], (p, _) =>
-        {
-            Misc.SetPlayerVolume(p, currentVol - 0.1f);
-            OpenVolumeSettings(p);
-        }, currentVol <= 0.0f);
-
         menu.Open(player);
     }
 
@@ -317,6 +459,8 @@ public class MenuManagerCore : BasePlugin, IPluginConfig<PluginConfig>
                 OpenPanoramaSettings(p);
             });
         }
+
+        AddPositionSelect(player, menu, OpenPanoramaSettings);
 
         menu.Open(player);
     }

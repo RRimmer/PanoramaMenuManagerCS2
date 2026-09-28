@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Menu;
 using MenuManager;
 
@@ -47,6 +47,12 @@ public class MenuInstance(
             _forcetype = MenuType.ButtonMenu;
         }
 
+        if (_forcetype == MenuType.CsgoMenu)
+        {
+            CsgoMenu.Show(player, this);
+            return;
+        }
+
         menu = _forcetype switch
         {
             MenuType.ChatMenu => new ChatMenu(Title),
@@ -56,6 +62,7 @@ public class MenuInstance(
             MenuType.ButtonMenu => new ButtonMenu(Title),
             MenuType.MetamodMenu => new ButtonMenu(Title, true),
             MenuType.PanoramaMenu => new ButtonMenu(Title),
+            MenuType.PanoramaWasdMenu => new ButtonMenu(Title),
             _ => menu
         };
 
@@ -100,7 +107,8 @@ public class MenuInstance(
             _ = menu.AddMenuOption(option.Text, option.OnSelect, option.Disabled);
         }
 
-        if (_forcetype == MenuType.PanoramaMenu && PanoramaHud.Show(player, this))
+        if ((_forcetype is MenuType.PanoramaMenu or MenuType.PanoramaWasdMenu) &&
+            PanoramaHud.Show(player, this, _forcetype == MenuType.PanoramaWasdMenu))
         {
             return;
         }
