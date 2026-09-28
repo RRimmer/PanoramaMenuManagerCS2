@@ -2,7 +2,7 @@
 
 <h2><a href="https://genesis-cs.space/menuconstructor/index.html">>>>Более подробная информация на сайте<<<</a></h2>
 
-Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **E!N**. This build continues the [Stimayk](https://github.com/Stimayk/MenuManagerCS2) fork.
+Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **Rimmer**. This build continues the [Stimayk](https://github.com/Stimayk/MenuManagerCS2) fork.
 
 A panorama menu for Counter-Strike 2: a clickable dialog or the same dialog on WASD, switches, dropdowns and toasts. Other plugins open menus through `MenuManagerApi`.
 
@@ -10,7 +10,7 @@ Current plugin version: ![Version](https://img.shields.io/github/v/release/RRimm
 
 ## Constructor site
 
-This site is ours. **E!N** built it for this fork: a live look editor, an API reference and a changelog. The original MenuManager does not ship this site.
+This site is ours. **Rimmer** built it for this fork: a live look editor, an API reference and a changelog. The original MenuManager does not ship this site.
 
 **[genesis-cs.space/menuconstructor](https://genesis-cs.space/menuconstructor/index.html)**
 
@@ -68,7 +68,7 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 
 # PanoramaMenuManagerCS2
 
-Форк [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) от **E!N**. Эта сборка продолжает форк [Stimayk](https://github.com/Stimayk/MenuManagerCS2).
+Форк [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) от **Rimmer**. Эта сборка продолжает форк [Stimayk](https://github.com/Stimayk/MenuManagerCS2).
 
 Панорамное меню для Counter-Strike 2: кликабельный диалог или тот же диалог на WASD, слайдеры, выпадающие списки и уведомления. Другие плагины открывают меню через `MenuManagerApi`.
 
@@ -76,7 +76,7 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 
 ## Сайт конструктора
 
-Это наш сайт. Его сделал **E!N** для этого форка: живой конструктор внешнего вида, справочник API и список изменений. Оригинальный MenuManager такого сайта не даёт.
+Это наш сайт. Его сделал **Rimmer** для этого форка: живой конструктор внешнего вида, справочник API и список изменений. Оригинальный MenuManager такого сайта не даёт.
 
 **[genesis-cs.space/menuconstructor](https://genesis-cs.space/menuconstructor/index.html)**
 
