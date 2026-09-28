@@ -2,7 +2,10 @@
 
 <h2><a href="https://genesis-cs.space/menuconstructor/index.html">>>>Более подробная информация на сайте<<<</a></h2>
 
-Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **Rimmer**. This build continues the [Stimayk](https://github.com/Stimayk/MenuManagerCS2) fork.
+Original version by
+[MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2). 
+This version is a continuation of the fork by Stimayk. 
+[Stimayk](https://github.com/Stimayk/MenuManagerCS2).
 
 A panorama menu for Counter-Strike 2: a clickable dialog or the same dialog on WASD, switches, dropdowns and toasts. Other plugins open menus through `MenuManagerApi`.
 
@@ -68,7 +71,8 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 
 # PanoramaMenuManagerCS2
 
-Форк [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) от **Rimmer**. Эта сборка продолжает форк [Stimayk](https://github.com/Stimayk/MenuManagerCS2).
+Оригинальная версия [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2). 
+Эта версия продолжает Форк [Stimayk](https://github.com/Stimayk/MenuManagerCS2).
 
 Панорамное меню для Counter-Strike 2: кликабельный диалог или тот же диалог на WASD, слайдеры, выпадающие списки и уведомления. Другие плагины открывают меню через `MenuManagerApi`.
 
