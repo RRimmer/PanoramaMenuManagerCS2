@@ -23,6 +23,9 @@ public interface IMenuApi
 
     public void CloseMenu(CCSPlayerController player);
     public MenuType GetMenuType(CCSPlayerController player);
+
+    // The selected type, including WASD panorama. GetMenuType reports WASD as PanoramaMenu.
+    public MenuType GetSelectedMenu(CCSPlayerController player);
     public bool HasOpenedMenu(CCSPlayerController player);
 
     public ChatMenuOption AddToggle(IMenu menu, string label, bool on,
@@ -49,5 +52,7 @@ public enum MenuType
     CenterMenu = 2,
     ButtonMenu = 3,
     MetamodMenu = 4,
-    PanoramaMenu = 5
+    PanoramaMenu = 5,
+    PanoramaWasdMenu = 6,
+    CsgoMenu = 7
 }

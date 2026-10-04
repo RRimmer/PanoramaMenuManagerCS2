@@ -31,22 +31,34 @@ internal class CMenuApi : IMenuApi
     public void CloseMenu(CCSPlayerController player)
     {
         Control.CloseMenu(player);
+        PanoramaHud.CloseMenu(player);
+        CsgoMenu.Close(player);
+        PaintRegistry.Close(player);
     }
 
+    // Plugins check "== PanoramaMenu" before AddToggle, AddSelect and Notify.
+    // The WASD panorama draws all three, so it reports as PanoramaMenu.
     public MenuType GetMenuType(CCSPlayerController player)
+    {
+        MenuType type = Misc.GetCurrentPlayerMenu(player);
+        return type == MenuType.PanoramaWasdMenu ? MenuType.PanoramaMenu : type;
+    }
+
+    public MenuType GetSelectedMenu(CCSPlayerController player)
     {
         return Misc.GetCurrentPlayerMenu(player);
     }
 
     public bool HasOpenedMenu(CCSPlayerController player)
     {
-        return Control.HasOpenedMenu(player);
+        return Control.HasOpenedMenu(player) || PanoramaHud.IsOpen(player) || CsgoMenu.IsOpen(player) ||
+               PaintRegistry.IsOpen(player);
     }
 
     public ChatMenuOption AddToggle(IMenu menu, string label, bool on,
         Action<CCSPlayerController, ChatMenuOption> onSelect, bool disabled = false)
     {
-        ChatMenuOption option = menu.AddMenuOption(label, onSelect, disabled);
+        ChatMenuOption option = menu.AddMenuOption(MenuOptionKind.WithState(label, on), onSelect, disabled);
         MenuOptionKind.SetToggle(option, on);
         return option;
     }
@@ -54,7 +66,8 @@ internal class CMenuApi : IMenuApi
     public ChatMenuOption AddSelect(IMenu menu, string label, string value, string[] choices,
         Action<CCSPlayerController, ChatMenuOption, int> onSelect, bool disabled = false)
     {
-        ChatMenuOption option = menu.AddMenuOption(label, (_, _) => { }, disabled);
+        string shown = string.IsNullOrWhiteSpace(value) ? label : $"[{value}] {label}";
+        ChatMenuOption option = menu.AddMenuOption(shown, (_, _) => { }, disabled);
         MenuOptionKind.SetSelect(option, value, choices, onSelect);
         return option;
     }

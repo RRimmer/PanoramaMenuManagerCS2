@@ -1,0 +1,33 @@
+RU:
+Панорамное меню (тип PanoramaMenu) для MenuManager 1.1.5.
+
+Файлы кладутся в корень аддона, который клиент получает через MultiAddonManager (csgo_addons), а не россыпью в папку dedicated-сервера.
+
+Нужны оба файла:
+  panorama/layout/custom_game/menu_ui.xml
+  panorama/styles/custom_game/ui.css
+
+В конфиге MenuManagerCore.json поставь "DefaultMenu": "PanoramaMenu".
+В IksAdmin тип меню 3 (ButtonMenu) в этой версии открывает меню по умолчанию, то есть панораму.
+
+MenuManagerApi.dll из этого релиза положи в addons/counterstrikesharp/shared/MenuManagerApi/ и убери старые копии из папок плагинов, иначе меню не откроется.
+
+1.1.5: уведомления (успех / внимание / ошибка) и слайдер для пунктов «название: вкл/выкл».
+1.1.4: диалог больше не открывается в том же кадре, что команда. Иначе сервер зависает на обработке CCLCMsg_Move и Valve кикает NETWORK_DISCONNECT_OVERFLOW.
+
+EN:
+Panorama menu (PanoramaMenu) for MenuManager 1.1.5.
+
+Put these files at the root of the addon that clients receive through MultiAddonManager (csgo_addons), not as loose files on the dedicated server.
+
+Both files are required:
+  panorama/layout/custom_game/menu_ui.xml
+  panorama/styles/custom_game/ui.css
+
+In MenuManagerCore.json set "DefaultMenu": "PanoramaMenu".
+IksAdmin menu type 3 (ButtonMenu) follows the default menu in this version, so it opens the panorama dialog.
+
+Place MenuManagerApi.dll from this release into addons/counterstrikesharp/shared/MenuManagerApi/ and remove older copies from plugin folders, otherwise the menu will not open.
+
+1.1.5: toasts (success / warning / error) and a switch for rows shaped like "name: on/off".
+1.1.4: the dialog no longer opens on the same tick as the command. Otherwise the server stalls while handling CCLCMsg_Move and Valve kicks with NETWORK_DISCONNECT_OVERFLOW.

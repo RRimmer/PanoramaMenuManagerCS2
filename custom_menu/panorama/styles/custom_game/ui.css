@@ -29,6 +29,8 @@
 	opacity: 1;
 	horizontal-align: center;
 	vertical-align: middle;
+	margin-left: 0px;
+	margin-right: 0px;
 	transform: scale3d(1, 1, 1);
 	transition-property: opacity, transform;
 	transition-duration: dur;
@@ -41,6 +43,28 @@
 {
 	opacity: 0;
 	transform: scale3d(0, 1, 1);
+}
+
+/* Position is switched by the plugin (pos-*). Without a class the menu keeps the start position above. */
+.utils-menu.pos-left
+{
+	horizontal-align: left;
+	margin-left: 40px;
+	margin-right: 0px;
+}
+
+.utils-menu.pos-center
+{
+	horizontal-align: center;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.utils-menu.pos-right
+{
+	horizontal-align: right;
+	margin-left: 0px;
+	margin-right: 40px;
 }
 
 .utils-bg
@@ -1064,6 +1088,125 @@
 	color: #ffffff;
 }
 
+/* ===== WASD mode (mode-wasd on the dialog) ===== */
+.utils-item-focus
+{
+	width: 4px;
+	height: 60%;
+	horizontal-align: left;
+	vertical-align: center;
+	background-color: accent;
+	border-radius: 2px;
+	visibility: collapse;
+}
+
+.utils-item.is-focus
+{
+	background-color: btn-bg-hover;
+}
+
+.utils-item.is-focus .utils-item-focus
+{
+	visibility: visible;
+}
+
+.utils-item.is-focus .utils-item-label
+{
+	color: #ffffff;
+}
+
+.utils-item.is-focus .utils-item-arrow
+{
+	wash-color: #ffffff;
+}
+
+.utils-item.is-disabled.is-focus
+{
+	background-color: rgba(6, 10, 16, 0.62);
+}
+
+.utils-item.is-disabled.is-focus .utils-item-label
+{
+	color: #aab6c4;
+}
+
+.utils-hint
+{
+	width: 100%;
+	horizontal-align: center;
+	text-align: center;
+	margin-top: 10px;
+	font-size: 13px;
+	letter-spacing: 1px;
+	color: label-color;
+	opacity: 0.85;
+	white-space: nowrap;
+	text-overflow: shrink;
+	visibility: collapse;
+}
+
+.utils-menu.mode-wasd .utils-hint
+{
+	visibility: visible;
+}
+
+.utils-menu.mode-wasd .utils-close-anchor,
+.utils-menu.mode-wasd .utils-back-anchor
+{
+	visibility: collapse;
+}
+
+/* A list that opens as a submenu (WASD, or more than 12 values): value + arrow to the right. */
+.utils-item.k-select.is-sub .utils-item-arrow
+{
+	transform: rotateZ(-90deg);
+	margin-right: 18px;
+	background-size: 12px 12px;
+}
+
+/* A row of that submenu. The current value gets a check mark. */
+.utils-item-check
+{
+	width: 16px;
+	height: 16px;
+	horizontal-align: right;
+	vertical-align: center;
+	margin-right: 18px;
+	overflow: noclip;
+	visibility: collapse;
+}
+
+.utils-check-a
+{
+	width: 6px;
+	height: 2px;
+	background-color: accent;
+	border-radius: 1px;
+	horizontal-align: left;
+	vertical-align: bottom;
+	margin-left: 1px;
+	margin-bottom: 4px;
+	transform: rotateZ(45deg);
+}
+
+.utils-check-b
+{
+	width: 12px;
+	height: 2px;
+	background-color: accent;
+	border-radius: 1px;
+	horizontal-align: left;
+	vertical-align: bottom;
+	margin-left: 4px;
+	margin-bottom: 6px;
+	transform: rotateZ(-50deg);
+}
+
+.utils-item.k-choice.is-picked .utils-item-check
+{
+	visibility: visible;
+}
+
 @define ntf-ok: #57e08a;
 @define ntf-warn: #ffcf5c;
 @define ntf-err: #ff5f6d;
@@ -1264,3 +1407,71 @@
 
 /* error */
 .utils-notify.ntf-error .ntf-bar { background-color: ntf-err; }
+
+.utils-csgo
+{
+	horizontal-align: center;
+	vertical-align: middle;
+	flow-children: down;
+	padding: 14px 22px 16px 18px;
+	background-color: rgba(20, 16, 12, 0.62);
+	opacity: 1;
+}
+
+.utils-csgo.csgo-hidden
+{
+	opacity: 0;
+	visibility: collapse;
+}
+
+.utils-csgo.pos-left
+{
+	horizontal-align: left;
+	margin-left: 40px;
+	margin-right: 0px;
+}
+
+.utils-csgo.pos-center
+{
+	horizontal-align: center;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.utils-csgo.pos-right
+{
+	horizontal-align: right;
+	margin-left: 0px;
+	margin-right: 40px;
+}
+
+.csgo-title
+{
+	color: #f2c14d;
+	font-size: 22px;
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+
+.csgo-row
+{
+	color: #e39b2b;
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 2px;
+}
+
+.csgo-row.csgo-off
+{
+	visibility: collapse;
+}
+
+.csgo-row.csgo-disabled
+{
+	color: #8d8d8d;
+}
+
+.csgo-gap
+{
+	height: 12px;
+}
