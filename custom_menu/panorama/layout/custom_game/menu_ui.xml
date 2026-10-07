@@ -48,9 +48,14 @@
 					<Panel class="utils-buttons">
 						<Panel id="utils-slot-0" class="utils-slot">
 						<Button id="utils-item-0" class="utils-item k-empty">
+							<Panel class="utils-item-focus" />
 							<Label class="utils-item-label stratum-medium-tf" text="{s:label}" />
 							<Label class="utils-item-value stratum-medium-tf" text="{s:value}" />
 							<Panel class="utils-item-arrow" />
+							<Panel class="utils-item-check">
+								<Panel class="utils-check-a" />
+								<Panel class="utils-check-b" />
+							</Panel>
 							<Panel class="utils-switch">
 								<Panel class="utils-switch-knob" />
 							</Panel>
@@ -109,9 +114,14 @@
 					</Panel>
 						<Panel id="utils-slot-1" class="utils-slot">
 						<Button id="utils-item-1" class="utils-item k-empty">
+							<Panel class="utils-item-focus" />
 							<Label class="utils-item-label stratum-medium-tf" text="{s:label}" />
 							<Label class="utils-item-value stratum-medium-tf" text="{s:value}" />
 							<Panel class="utils-item-arrow" />
+							<Panel class="utils-item-check">
+								<Panel class="utils-check-a" />
+								<Panel class="utils-check-b" />
+							</Panel>
 							<Panel class="utils-switch">
 								<Panel class="utils-switch-knob" />
 							</Panel>
@@ -170,9 +180,14 @@
 					</Panel>
 						<Panel id="utils-slot-2" class="utils-slot">
 						<Button id="utils-item-2" class="utils-item k-empty">
+							<Panel class="utils-item-focus" />
 							<Label class="utils-item-label stratum-medium-tf" text="{s:label}" />
 							<Label class="utils-item-value stratum-medium-tf" text="{s:value}" />
 							<Panel class="utils-item-arrow" />
+							<Panel class="utils-item-check">
+								<Panel class="utils-check-a" />
+								<Panel class="utils-check-b" />
+							</Panel>
 							<Panel class="utils-switch">
 								<Panel class="utils-switch-knob" />
 							</Panel>
@@ -231,9 +246,14 @@
 					</Panel>
 						<Panel id="utils-slot-3" class="utils-slot">
 						<Button id="utils-item-3" class="utils-item k-empty">
+							<Panel class="utils-item-focus" />
 							<Label class="utils-item-label stratum-medium-tf" text="{s:label}" />
 							<Label class="utils-item-value stratum-medium-tf" text="{s:value}" />
 							<Panel class="utils-item-arrow" />
+							<Panel class="utils-item-check">
+								<Panel class="utils-check-a" />
+								<Panel class="utils-check-b" />
+							</Panel>
 							<Panel class="utils-switch">
 								<Panel class="utils-switch-knob" />
 							</Panel>
@@ -292,9 +312,14 @@
 					</Panel>
 						<Panel id="utils-slot-4" class="utils-slot">
 						<Button id="utils-item-4" class="utils-item k-empty">
+							<Panel class="utils-item-focus" />
 							<Label class="utils-item-label stratum-medium-tf" text="{s:label}" />
 							<Label class="utils-item-value stratum-medium-tf" text="{s:value}" />
 							<Panel class="utils-item-arrow" />
+							<Panel class="utils-item-check">
+								<Panel class="utils-check-a" />
+								<Panel class="utils-check-b" />
+							</Panel>
 							<Panel class="utils-switch">
 								<Panel class="utils-switch-knob" />
 							</Panel>
@@ -353,9 +378,14 @@
 					</Panel>
 						<Panel id="utils-slot-5" class="utils-slot">
 						<Button id="utils-item-5" class="utils-item k-empty">
+							<Panel class="utils-item-focus" />
 							<Label class="utils-item-label stratum-medium-tf" text="{s:label}" />
 							<Label class="utils-item-value stratum-medium-tf" text="{s:value}" />
 							<Panel class="utils-item-arrow" />
+							<Panel class="utils-item-check">
+								<Panel class="utils-check-a" />
+								<Panel class="utils-check-b" />
+							</Panel>
 							<Panel class="utils-switch">
 								<Panel class="utils-switch-knob" />
 							</Panel>
@@ -419,7 +449,22 @@
 						<Label id="utils-page" class="utils-pagination-label stratum-medium-tf" text="{s:page}" />
 						<Button id="utils-next" class="utils-pagination-btn utils-next" />
 					</Panel>
+					<Label id="utils-hint" class="utils-hint stratum-medium-tf" text="{s:hint}" />
 				</Panel>
+			</Panel>
+			<Panel id="utils-csgo" class="utils-csgo csgo-hidden">
+				<Label id="utils-csgo-title" class="csgo-title stratum-bold-tf" text="{s:csgotitle}" />
+				<Label id="utils-csgo-row-1" class="csgo-row stratum-medium-tf" text="{s:csgo1}" />
+				<Label id="utils-csgo-row-2" class="csgo-row stratum-medium-tf" text="{s:csgo2}" />
+				<Label id="utils-csgo-row-3" class="csgo-row stratum-medium-tf" text="{s:csgo3}" />
+				<Label id="utils-csgo-row-4" class="csgo-row stratum-medium-tf" text="{s:csgo4}" />
+				<Label id="utils-csgo-row-5" class="csgo-row stratum-medium-tf" text="{s:csgo5}" />
+				<Label id="utils-csgo-row-6" class="csgo-row stratum-medium-tf" text="{s:csgo6}" />
+				<Label id="utils-csgo-row-7" class="csgo-row stratum-medium-tf" text="{s:csgo7}" />
+				<Label class="csgo-gap" text="" />
+				<Label id="utils-csgo-row-8" class="csgo-row stratum-medium-tf" text="{s:csgo8}" />
+				<Label id="utils-csgo-row-9" class="csgo-row stratum-medium-tf" text="{s:csgo9}" />
+				<Label id="utils-csgo-row-0" class="csgo-row stratum-medium-tf" text="{s:csgo0}" />
 			</Panel>
 		</Panel>
 	</Panel>
