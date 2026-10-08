@@ -10,7 +10,7 @@ namespace MenuManagerCore;
 
 internal static class PanoramaHud
 {
-    internal const string LayoutPath = "panorama/layout/custom_game/menu_ui.xml";
+    internal static string LayoutPath = "panorama/layout/custom_game/menu_ui.xml";
     private const string DialogId = "utils-dialog";
     private const int ItemsPerPage = 6;
     private const int MaxSelectOptions = 12;
