@@ -17,6 +17,11 @@ internal class CMenuApi : IMenuApi
         return new MenuInstance(title, backAction);
     }
 
+    public void SetPanoramaHudLayout(string path)
+    {
+        PanoramaHud.LayoutPath = path;
+    }
+    
     public IMenu GetMenuForcetype(string title, MenuType type, Action<CCSPlayerController>? backAction = null,
         Action<CCSPlayerController>? resetAction = null)
     {

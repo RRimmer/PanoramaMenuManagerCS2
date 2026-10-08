@@ -13,6 +13,8 @@ public interface IMenuApi
     public IMenu NewMenu(string title, Action<CCSPlayerController>? backAction = null);
     //
 
+    public void SetPanoramaHudLayout(string path);
+    
     public IMenu GetMenuForcetype(string title, MenuType type, Action<CCSPlayerController>? backAction = null,
         Action<CCSPlayerController>? resetAction = null);
 
