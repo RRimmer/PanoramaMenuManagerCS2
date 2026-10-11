@@ -25,6 +25,7 @@ This site is ours. **Rimmer** built it for this fork: a live look editor, an API
 | --- | --- |
 | `MenuManagerCore` | The server plugin |
 | `MenuManagerApi` | The library other plugins call |
+| `MenuManagerCore/Compat/CS2MenuManager` | Small `CS2MenuManager.dll` (API of schwarper's CS2MenuManager 1.0.43). It is built with the core, embedded into `MenuManagerCore.dll` and written to `shared/CS2MenuManager` on start |
 | `MenuManagerTest` | A short example |
 | `custom_menu` | The client panorama: `menu_ui.xml` and `ui.css` |
 
@@ -46,9 +47,19 @@ From 1.1.11, leave `plugins/MenuManagerCore/runtimes` in place. SQLite loads `li
 
 PlayerSettingsCS2 and AnyBaseLibCS2 are not required. This fork stores the player menu itself.
 
+From 1.2.04 the core also opens menus of plugins built for schwarper's CS2MenuManager 1.0.43, such as cs2-store. Do not install schwarper's CS2MenuManager: on start the core writes its own `shared/CS2MenuManager/CS2MenuManager.dll` (`"CS2MenuManagerCompat": true`). Update `shared/MenuManagerApi` together with the core.
+
 Copy `Content-addonmanager` into the root of the MultiAddonManager client addon. Do not drop the files loose on the dedicated server. After a panorama update the player has to rejoin.
 
-Keep `"DefaultMenu": "PanoramaMenu"` or `"PanoramaWasdMenu"` in the config. Empty `PanoramaPosition` means center; `left` and `right` sit in the vertical middle. Menu colors are chosen in the constructor and installed with the client addon. Notifications stay on with `"Notifications": true`. A player on Panorama changes them, and the panel position, for themselves in `!menu`.
+Keep `"DefaultMenu": "PanoramaMenu"` or `"PanoramaWasdMenu"` in the config. Empty `PanoramaPosition` means center; `left` and `right` sit in the vertical middle. `"HudOpenDelay": 0.2` pauses the normal panorama and CSGO Menu so a chat command and the HUD are not the same frame. `GetSelectedMenu` returns the real menu type, including WASD. Menu colors are chosen in the constructor and installed with the client addon. Notifications stay on with `"Notifications": true`. A player on Panorama changes them, and the panel position, for themselves in `!menu`.
+
+You can read more on the site: https://genesis-cs.space/menuconstructor/index.html
+
+**1.2.04.** Menus of plugins built for schwarper's CS2MenuManager 1.0.43 (cs2-store v33 and others) open in PMM without rebuilding them. The core embeds a small `CS2MenuManager.dll` and writes it to `shared/CS2MenuManager` on start; all menu logic stays in the core (`MenuCompat.cs`), the bridge is `IMenuCompatApi` (capability `menu:nfcore:compat`) in `MenuManagerApi`. New config field `"CS2MenuManagerCompat": true`. Update `shared/MenuManagerApi` with the core. The cs2-store panel itself is the separate module PMM_StoreCore.
+
+**1.2.03.** `configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json` translates menu labels per plugin. CS2-SimpleAdmin and IksAdmin are already filled in. A missing file is created on the server; an existing file is left as it is. Linux `libe_sqlite3.so` now works on glibc 2.28, so an older host no longer fails with `GLIBC_2.33 not found`. On panorama, `AddToggle` and `AddSelect` update the row in place. The menu does not close and the page stays.
+
+The SwiftlyS2 build is the release archive `MenuManagerCS2-1.2.03-swiftlys2.zip`. [PMM_WeaponPaints 0.1.0](https://github.com/RRimmer/PMM-WeaponPaints/releases/tag/PMM_WeaponPaints-0.1.0) is a separate project (beta). Its panorama design is inspired by [EliteGames.Ro](https://elitegames.ro).
 
 `PisexMenusBridge` does not replace the Pisex `IMenusApi`. Plugins linked to cs2-menus still call that library. When the bridge is on and Pisex draws the same `menu_ui.xml`, this plugin overlays position and open-list labels on that HUD. Menus that do not use this layout stay on the Pisex UI. Missing cs2-menus is not a load error.
 
@@ -93,6 +104,7 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 | --- | --- |
 | `MenuManagerCore` | Плагин сервера |
 | `MenuManagerApi` | Библиотека для чужих плагинов |
+| `MenuManagerCore/Compat/CS2MenuManager` | Маленький `CS2MenuManager.dll` (API CS2MenuManager 1.0.43 от schwarper). Собирается вместе с ядром, вшит в `MenuManagerCore.dll`, при старте ядро кладёт его в `shared/CS2MenuManager` |
 | `MenuManagerTest` | Короткий пример |
 | `custom_menu` | Клиентская панорама: `menu_ui.xml` и `ui.css` |
 
@@ -114,9 +126,19 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 
 PlayerSettingsCS2 и AnyBaseLibCS2 не нужны. Этот форк сам хранит меню игрока.
 
+С 1.2.04 ядро открывает и меню плагинов под CS2MenuManager 1.0.43 от schwarper, например cs2-store. CS2MenuManager от schwarper не ставь: при старте ядро само кладёт свой `shared/CS2MenuManager/CS2MenuManager.dll` (`"CS2MenuManagerCompat": true`). `shared/MenuManagerApi` обновляй вместе с ядром.
+
 `Content-addonmanager` копируется в корень клиентского аддона MultiAddonManager, не россыпью на dedicated server. После замены панорамы игрок заходит на сервер заново.
 
-В конфиге можно `"DefaultMenu": "PanoramaMenu"` или `"PanoramaWasdMenu"`. Пустой `PanoramaPosition` — центр; `left` и `right` стоят по вертикали посередине. Цвет меню выбирается в конструкторе и ставится вместе с клиентским аддоном. Уведомления включены полем `"Notifications": true`. Игрок с типом Панорама меняет их и позицию панели себе в `!menu`.
+В конфиге можно `"DefaultMenu": "PanoramaMenu"` или `"PanoramaWasdMenu"`. Пустой `PanoramaPosition` — центр; `left` и `right` стоят по вертикали посередине. `"HudOpenDelay": 0.2` — пауза обычной панорамы и CSGO Menu, чтобы команда в чате и HUD не попадали в один кадр. `GetSelectedMenu` отдаёт реальный тип меню, включая WASD. Цвет меню выбирается в конструкторе и ставится вместе с клиентским аддоном. Уведомления включены полем `"Notifications": true`. Игрок с типом Панорама меняет их и позицию панели себе в `!menu`.
+
+Вы можете ознакомиться с более подробной информацией на сайте: https://genesis-cs.space/menuconstructor/index.html
+
+**1.2.04.** Меню плагинов под CS2MenuManager 1.0.43 от schwarper (cs2-store v33 и другие) открываются в PMM без пересборки этих плагинов. В ядро вшит маленький `CS2MenuManager.dll`, при старте ядро кладёт его в `shared/CS2MenuManager`; вся логика меню остаётся в ядре (`MenuCompat.cs`), связь — `IMenuCompatApi` (capability `menu:nfcore:compat`) в `MenuManagerApi`. Новое поле конфига `"CS2MenuManagerCompat": true`. `shared/MenuManagerApi` обновляй вместе с ядром. Своя панель магазина cs2-store — отдельный модуль PMM_StoreCore.
+
+**1.2.03.** Файл `configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json` уже в репозитории: переводы меню CS2-SimpleAdmin и IksAdmin. Если на сервере файла нет, ядро создаёт этот пример. Уже существующий файл не перезаписывается. `libe_sqlite3.so` для Linux собран под glibc 2.28, старый хост больше не падает с `GLIBC_2.33 not found`. На панораме `AddToggle` и `AddSelect` обновляют строку на месте: меню не закрывается и страница не сбрасывается.
+
+Сборка для SwiftlyS2 — архив релиза `MenuManagerCS2-1.2.03-swiftlys2.zip`. [PMM_WeaponPaints 0.1.0](https://github.com/RRimmer/PMM-WeaponPaints/releases/tag/PMM_WeaponPaints-0.1.0) — отдельный проект (beta). Дизайн его панорамы вдохновлён [EliteGames.Ro](https://elitegames.ro).
 
 `PisexMenusBridge` не подменяет `IMenusApi` Pisex. Плагины, собранные с cs2-menus, по-прежнему зовут ту библиотеку. Если мост включён и Pisex рисует тот же `menu_ui.xml`, этот плагин накладывает на их HUD позицию и подписи открытого списка. Меню без этого layout остаются интерфейсом Pisex. Отсутствие cs2-menus не ошибка загрузки.
 

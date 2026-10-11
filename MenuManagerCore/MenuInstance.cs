@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Menu;
 using MenuManager;
 
@@ -17,6 +17,9 @@ public class MenuInstance(
 
     public string Title { get; set; } = title;
 
+    private readonly PhraseSlot _titleSlot = new();
+    private readonly Dictionary<ChatMenuOption, PhraseSlot> _optionSlots = new();
+
     public List<ChatMenuOption> MenuOptions { get; } = [];
 
     public bool ExitButton { get; set; } = true;
@@ -33,21 +36,44 @@ public class MenuInstance(
 
     public void Open(CCSPlayerController player)
     {
+        ResolvePhrases(player);
         IMenu? menu = null;
 
+        // WeaponPaints keeps one menu object and opens it again. Resolve Default and
+        // ButtonMenu on every open, otherwise the first player's type sticks forever.
         // IksAdmin MenuType 3 calls NewMenuForcetype(ButtonMenu). That value is the
         // old WASD/center-HTML menu. Follow the configured menu (Panorama) instead.
-        if (_forcetype is MenuType.Default or MenuType.ButtonMenu)
+        MenuType type = _forcetype;
+        if (type is MenuType.Default or MenuType.ButtonMenu)
         {
-            _forcetype = Misc.GetCurrentPlayerMenu(player);
+            type = Misc.GetCurrentPlayerMenu(player);
         }
 
-        if (_forcetype == MenuType.MetamodMenu && !MenusMm.Hooked())
+        if (type == MenuType.MetamodMenu && !MenusMm.Hooked())
         {
-            _forcetype = MenuType.ButtonMenu;
+            type = MenuType.ButtonMenu;
         }
 
-        menu = _forcetype switch
+        if (type == MenuType.CsgoMenu)
+        {
+            CsgoMenu.Show(player, this);
+            return;
+        }
+
+        // Mouse panorama only. A module such as PMM_WeaponPaints may draw this
+        // menu itself. The option callbacks stay the ones the other plugin set.
+        if (type == MenuType.PanoramaMenu)
+        {
+            Control.CloseMenu(player);
+            CsgoMenu.Close(player);
+            PanoramaHud.CloseMenu(player);
+            if (PaintRegistry.TryPaint(player, this))
+            {
+                return;
+            }
+        }
+
+        menu = type switch
         {
             MenuType.ChatMenu => new ChatMenu(Title),
             MenuType.ConsoleMenu => new ConsoleMenu(Title),
@@ -56,6 +82,7 @@ public class MenuInstance(
             MenuType.ButtonMenu => new ButtonMenu(Title),
             MenuType.MetamodMenu => new ButtonMenu(Title, true),
             MenuType.PanoramaMenu => new ButtonMenu(Title),
+            MenuType.PanoramaWasdMenu => new ButtonMenu(Title),
             _ => menu
         };
 
@@ -80,14 +107,14 @@ public class MenuInstance(
                 });
         }
 
-        if (_forcetype == MenuType.ButtonMenu)
+        if (type == MenuType.ButtonMenu)
         {
             ((ButtonMenu)menu).BackAction = OnBackAction;
             ((ButtonMenu)menu).ResetAction = OnResetAction;
         }
         else
         {
-            bool flag = _forcetype == MenuType.CenterMenu;
+            bool flag = type == MenuType.CenterMenu;
             menu.Title = Misc.ColorText(menu.Title, flag);
             foreach (ChatMenuOption t in MenuOptions)
             {
@@ -100,14 +127,15 @@ public class MenuInstance(
             _ = menu.AddMenuOption(option.Text, option.OnSelect, option.Disabled);
         }
 
-        if (_forcetype == MenuType.PanoramaMenu && PanoramaHud.Show(player, this))
+        if ((type is MenuType.PanoramaMenu or MenuType.PanoramaWasdMenu) &&
+            PanoramaHud.Show(player, this, type == MenuType.PanoramaWasdMenu))
         {
             return;
         }
 
         if (Control.GetPlugin()!.Config.UseMetamodMenu &&
-            ((Control.GetPlugin()!.Config.UseMetamodMenuReplace && _forcetype == MenuType.ButtonMenu) ||
-             _forcetype == MenuType.MetamodMenu))
+            ((Control.GetPlugin()!.Config.UseMetamodMenuReplace && type == MenuType.ButtonMenu) ||
+             type == MenuType.MetamodMenu))
         {
             MenusMm.PassMenuToMm(player, this);
         }
@@ -124,6 +152,42 @@ public class MenuInstance(
         {
             Open(player);
         }
+    }
+
+    private void ResolvePhrases(CCSPlayerController player)
+    {
+        Title = ResolveSlot(player, Title, _titleSlot);
+        foreach (ChatMenuOption option in MenuOptions)
+        {
+            if (!_optionSlots.TryGetValue(option, out PhraseSlot? slot))
+            {
+                slot = new PhraseSlot();
+                _optionSlots[option] = slot;
+            }
+
+            option.Text = ResolveSlot(player, option.Text, slot);
+        }
+    }
+
+    private static string ResolveSlot(CCSPlayerController player, string current, PhraseSlot slot)
+    {
+        // The first open keeps the raw label (SA_SLAP) as the source. While the
+        // visible text is still the phrase from the last open, the next player
+        // is translated again. A plugin that replaces the label becomes the new source.
+        if (!string.Equals(current, slot.Applied, StringComparison.Ordinal))
+        {
+            slot.Source = current;
+        }
+
+        string applied = ModuleTranslations.Apply(player, slot.Source ?? current);
+        slot.Applied = applied;
+        return applied;
+    }
+
+    private sealed class PhraseSlot
+    {
+        public string? Source;
+        public string? Applied;
     }
 
     private void OnBackAction(CCSPlayerController player)

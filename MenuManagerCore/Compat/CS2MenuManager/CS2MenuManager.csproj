@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        Part of MenuManagerCore, not a separate plugin.
+        MenuManagerCore embeds this assembly and on start writes it to
+        shared/CS2MenuManager/CS2MenuManager.dll. Plugins built against
+        schwarper/CS2MenuManager 1.0.43 (cs2-store v33 and others) load it there,
+        and every call goes back into the core through IMenuCompatApi ("menu:nfcore:compat").
+        All menu logic lives in MenuManagerCore/MenuCompat.cs.
+    -->
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>CS2MenuManager</AssemblyName>
+        <RootNamespace>CS2MenuManager</RootNamespace>
+        <!-- cs2-store v33 asks for CS2MenuManager, Version=1.0.43.0 -->
+        <Version>1.0.43</Version>
+        <AssemblyVersion>1.0.43.0</AssemblyVersion>
+        <FileVersion>1.0.43.0</FileVersion>
+        <InformationalVersion>1.0.43-pmm</InformationalVersion>
+        <Deterministic>true</Deterministic>
+        <DebugType>none</DebugType>
+        <GenerateDependencyFile>false</GenerateDependencyFile>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CounterStrikeSharp.API" Version="1.0.376">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <ProjectReference Include="..\..\..\MenuManagerApi\MenuManagerApi.csproj">
+            <Private>false</Private>
+        </ProjectReference>
+    </ItemGroup>
+
+</Project>

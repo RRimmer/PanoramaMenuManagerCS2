@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using MenuManager;
 using Microsoft.Extensions.Logging;
@@ -27,7 +27,7 @@ internal static class Misc
 
     public static void SetDefaultMenu(string defaultMenuStr)
     {
-        List<string> menuTypes = new(["ButtonMenu", "CenterMenu", "ConsoleMenu", "ChatMenu", "MetamodMenu", "PanoramaMenu"]);
+        List<string> menuTypes = new(["ButtonMenu", "CenterMenu", "ConsoleMenu", "ChatMenu", "MetamodMenu", "PanoramaMenu", "PanoramaWasdMenu", "CsgoMenu"]);
         if (menuTypes.Contains(defaultMenuStr))
         {
             _defaultMenu = defaultMenuStr;
@@ -66,11 +66,20 @@ internal static class Misc
         }
 
         ulong? steamId = player.AuthorizedSteamID?.SteamId64;
-        return steamId == null
+        if (steamId == null ||
+            !MenuManagerCore.PlayerSettingsCache.TryGetValue(steamId.Value, out PlayerSettings? settings))
+        {
+            return _defaultMenuType;
+        }
+
+        if (settings.MenuChosen)
+        {
+            return settings.MenuType == MenuType.Default ? _defaultMenuType : settings.MenuType;
+        }
+
+        return settings.MenuType is MenuType.Default or MenuType.ButtonMenu
             ? _defaultMenuType
-            : MenuManagerCore.PlayerSettingsCache.TryGetValue(steamId.Value, out PlayerSettings? settings)
-            ? settings.MenuType == MenuType.ButtonMenu ? _defaultMenuType : settings.MenuType
-            : _defaultMenuType;
+            : settings.MenuType;
     }
 
     public static bool GetPlayerPagination(CCSPlayerController player)
@@ -98,6 +107,31 @@ internal static class Misc
                settings.Notifications != false;
     }
 
+    public static bool GetCsgoDeadHint(CCSPlayerController player)
+    {
+        if (!IsValidPlayer(player) || player.AuthorizedSteamID == null)
+        {
+            return true;
+        }
+
+        return !MenuManagerCore.PlayerSettingsCache.TryGetValue(player.AuthorizedSteamID.SteamId64, out PlayerSettings? settings) ||
+               settings.CsgoDeadHint != false;
+    }
+
+    public static void SetCsgoDeadHint(CCSPlayerController player, bool enabled)
+    {
+        if (!IsValidPlayer(player) || player.AuthorizedSteamID == null)
+        {
+            return;
+        }
+
+        ulong steamId = player.AuthorizedSteamID.SteamId64;
+        PlayerSettings settings = GetOrAddSettings(steamId);
+        settings.CsgoDeadHint = enabled;
+        MenuManagerCore.PlayerSettingsCache[steamId] = settings;
+        SaveSettingsAsync(steamId, settings);
+    }
+
     public static void SetPlayerNotifications(CCSPlayerController player, bool enabled)
     {
         if (!IsValidPlayer(player) || player.AuthorizedSteamID == null)
@@ -108,6 +142,48 @@ internal static class Misc
         ulong steamId = player.AuthorizedSteamID.SteamId64;
         PlayerSettings settings = GetOrAddSettings(steamId);
         settings.Notifications = enabled;
+        MenuManagerCore.PlayerSettingsCache[steamId] = settings;
+        SaveSettingsAsync(steamId, settings);
+    }
+
+    internal static string? NormalizePosition(string? value)
+    {
+        return value?.Trim().ToLowerInvariant() switch
+        {
+            "left" => "left",
+            "center" or "centre" or "middle" => "center",
+            "right" => "right",
+            _ => null
+        };
+    }
+
+    public static string? GetPlayerPosition(CCSPlayerController player)
+    {
+        return GetOwnPosition(player) ?? NormalizePosition(Control.GetPlugin()?.Config.PanoramaPosition);
+    }
+
+    public static string? GetOwnPosition(CCSPlayerController player)
+    {
+        if (!IsValidPlayer(player) || player.AuthorizedSteamID == null)
+        {
+            return null;
+        }
+
+        return MenuManagerCore.PlayerSettingsCache.TryGetValue(player.AuthorizedSteamID.SteamId64, out PlayerSettings? settings)
+            ? settings.MenuPosition
+            : null;
+    }
+
+    public static void SetPlayerPosition(CCSPlayerController player, string? position)
+    {
+        if (!IsValidPlayer(player) || player.AuthorizedSteamID == null)
+        {
+            return;
+        }
+
+        ulong steamId = player.AuthorizedSteamID.SteamId64;
+        PlayerSettings settings = GetOrAddSettings(steamId);
+        settings.MenuPosition = NormalizePosition(position);
         MenuManagerCore.PlayerSettingsCache[steamId] = settings;
         SaveSettingsAsync(steamId, settings);
     }
@@ -138,12 +214,15 @@ internal static class Misc
 
         PlayerSettings settings = GetOrAddSettings(steamId);
         settings.MenuType = type;
+        settings.MenuChosen = true;
 
         MenuManagerCore.PlayerSettingsCache[steamId] = settings;
 
         player.PrintToChat($"{Control.GetPlugin()?.Localizer["menumanager.selected_type"]} {GetMenuTypeName(type)}");
         SaveSettingsAsync(steamId, settings);
         CounterStrikeSharp.API.Modules.Menu.MenuManager.CloseActiveMenu(player);
+        PanoramaHud.CloseMenu(player);
+        CsgoMenu.Close(player);
     }
 
     public static void SetPlayerPagination(CCSPlayerController player, bool pagination)
@@ -221,7 +300,12 @@ internal static class Misc
                                    throw new InvalidOperationException(),
             MenuType.MetamodMenu => Control.GetPlugin()?.Localizer["menumanager.metamod"] ??
                                     throw new InvalidOperationException(),
-            MenuType.PanoramaMenu => "Panorama",
+            MenuType.PanoramaMenu => Control.GetPlugin()?.Localizer["menumanager.panorama_mouse"] ??
+                                     throw new InvalidOperationException(),
+            MenuType.PanoramaWasdMenu => Control.GetPlugin()?.Localizer["menumanager.panorama_wasd"] ??
+                                         throw new InvalidOperationException(),
+            MenuType.CsgoMenu => Control.GetPlugin()?.Localizer["menumanager.csgo"] ??
+                                 throw new InvalidOperationException(),
             _ => "Undefined"
         };
     }

@@ -1,8 +1,34 @@
 # Список изменений
 
+Вы можете ознакомиться с более подробной информацией на сайте: https://genesis-cs.space/menuconstructor/index.html
+
 Подробная страница на сайте: [Список изменений](https://genesis-cs.space/menuconstructor/menumanager/changelog/index.html).
 
 ## Ядро
+
+### 1.2.04
+
+- Ядро открывает меню плагинов, собранных под [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) 1.0.43 от schwarper. Сделано под [cs2-store](https://github.com/schwarper/cs2-store) v33: магазин, инвентарь, покупка с подтверждением, экипировка, продажа, «Назад». Сам плагин не меняется и не пересобирается.
+- CS2MenuManager от schwarper больше не нужен. В `MenuManagerCore.dll` вшит маленький `CS2MenuManager.dll`. При старте ядро кладёт его в `shared/CS2MenuManager/`. Если там лежал оригинал, ядро сохраняет его как `CS2MenuManager.dll.original` и пишет об этом в лог.
+- Логика этих меню находится в ядре (`MenuCompat.cs`). Вшитая сборка только передаёт вызовы ядру через новый `IMenuCompatApi` (capability `menu:nfcore:compat`) в `MenuManagerApi`.
+- Тип меню берётся из `!menu` игрока. Поле `MenuType` в конфиге такого плагина ни на что не влияет. Пункт закрывает меню, открывает его заново или оставляет как есть: так же, как в CS2MenuManager. Если обработчик открыл следующее меню, оно и остаётся на экране.
+- `"CS2MenuManagerCompat": true` в `MenuManagerCore.json`. При `false` файл не пишется.
+- Обнови `shared/MenuManagerApi` вместе с ядром.
+- Если плагин успел загрузиться раньше ядра и упал с `Could not load file or assembly 'CS2MenuManager'`, перезапусти сервер ещё один раз. Это нужно только при первой установке.
+- Голосований `PanoramaVote` / `VoteManager` и `CS2MenuManager.toml` нет.
+
+### 1.2.03
+
+- Файл `configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json`. В нём у каждого плагина свои ключи и переводы. Пример заполнен для `CS2-SimpleAdmin` и `IksAdmin`. Код этих плагинов не меняется. Если файла нет, ядро создаёт этот пример. Уже существующий файл не перезаписывается.
+- `libe_sqlite3.so` для Linux больше не требует glibc 2.33. Берётся сборка SQLite 3.49.1, ей хватает glibc 2.28. На старом хосте ядро из-за `GLIBC_2.33 not found` больше не падает при старте.
+- Панорама: после клика по `AddToggle` тумблер обновляется на месте, без Close/Open меню (нет мигания и сброса страницы).
+- Панорама: после выбора в `AddSelect` текущее значение в строке обновляется сразу, меню остаётся открытым.
+- Эти правки UI нужны для VIPCore (тумблеры вкл/выкл, выпадающие FOV/Tag в `!vip`).
+
+### 1.2.02
+
+- Собрано под CounterStrikeSharp 1.0.376.
+- В `MenuManagerCore.json` поле `HudOpenDelay`, по умолчанию `0.2`. Это пауза перед показом обычной панорамы и CSGO Menu, чтобы команда в чате и HUD не попадали в один кадр. Локер WeaponPaints этой паузой не управляется: у него свой `OpenDelay`.
 
 ### 1.2.00
 
