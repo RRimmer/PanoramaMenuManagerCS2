@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 
@@ -163,6 +163,17 @@ internal static class Control
         }
     }
 
+    internal static string NextPageSound()
+    {
+        MenuManagerCore? plugin = GetPlugin();
+        if (plugin == null)
+        {
+            return "";
+        }
+
+        return string.IsNullOrWhiteSpace(plugin.Config.SoundNext) ? plugin.Config.SoundScroll : plugin.Config.SoundNext;
+    }
+
     public static void PlaySound(CCSPlayerController player, string sound)
     {
         if (string.IsNullOrEmpty(sound))
@@ -186,8 +197,7 @@ internal static class Control
                 return;
             }
 
-            float vol = Misc.GetPlayerVolume(player);
-            _ = player.EmitSound(sound, player, vol);
+            _ = player.EmitSound(sound, player, _hPlugin.Config.SoundVolume);
         }
     }
 
@@ -222,6 +232,31 @@ internal static class Control
         }
 
         MenusMm.ClosePlayerMenu(player.Slot);
+    }
+
+    internal static bool Freeze(CCSPlayerController player)
+    {
+        if (!player.PawnIsAlive || player.Pawn.Value == null || player.Pawn.Value.MoveType != MoveType_t.MOVETYPE_WALK)
+        {
+            return false;
+        }
+
+        player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_NONE;
+        Schema.SetSchemaValue(player.Pawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 0);
+        Utilities.SetStateChanged(player.Pawn.Value, "CBaseEntity", "m_MoveType");
+        return true;
+    }
+
+    internal static void Unfreeze(CCSPlayerController player)
+    {
+        if (!player.PawnIsAlive || player.Pawn.Value == null || player.Pawn.Value.MoveType != MoveType_t.MOVETYPE_NONE)
+        {
+            return;
+        }
+
+        player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+        Schema.SetSchemaValue(player.Pawn.Value.Handle, "CBaseEntity", "m_nActualMoveType", 2);
+        Utilities.SetStateChanged(player.Pawn.Value, "CBaseEntity", "m_MoveType");
     }
 
     internal static bool HasOpenedMenu(CCSPlayerController player, PlayerInfo? info = null)

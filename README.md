@@ -46,6 +46,18 @@ From 1.1.11, leave `plugins/MenuManagerCore/runtimes` in place. SQLite loads `li
 
 PlayerSettingsCS2 and AnyBaseLibCS2 are not required. This fork stores the player menu itself.
 
+From 1.3.00 the release also has three empty stubs: `plugins/PlayerSettings/PlayerSettings.dll`, `shared/PlayerSettingsApi/PlayerSettingsApi.dll`, `shared/AnyBaseLib/AnyBaseLib.dll`. CS2-SimpleAdmin and other plugins made for NickFox's MenuManagerCS2 check these files and unload without them. The stubs have no `ISettingsApi`. If a plugin really calls `settings:nfcore`, install the original PlayerSettingsCS2 and AnyBaseLibCS2 instead and do not overwrite them with the stubs.
+
+`"PanoramaLayoutPath"` (empty = `panorama/layout/custom_game/menu_ui.xml`) and `IMenuApi.SetPanoramaHudLayout(path)` switch the panorama layout file. It is one file for the whole server and must keep the ids and classes of `menu_ui.xml`.
+
+Number keys (1.3.00): CSGO Menu and `PanoramaDigitMenu` ("Panorama (number keys)": the panorama without the mouse, items 1–6, 8 back, 9 next, 0 exit) are driven by the binds `css_1` … `css_0`. Choosing either in `!menu` opens the number keys test: keys 1…0 light up as the server gets them, the bind line goes to chat and console. The server cannot write binds into the client, the player pastes the line once:
+`spec_usenumberkeys_nobinds 0;bind "1" "css_1; slot1";…;bind "0" "css_0; slot10"` (the space after `;` is required, it makes the keys work while dead too).
+Other plugins can use the same keys: `IMenuApi.GetNumberKeysBindLine()`, `PrintNumberKeysBinds(player)`, `HasNumberKeysChecked(player)`, `OpenNumberKeysCheck(player, onDone)` and the event `NumberKeyPressed(player, digit)`. `"NumberKeysTestTimeout": 40` in `MenuManagerCore.json`.
+
+Menu sounds (1.3.00): `SoundScroll`, `SoundClick`, `SoundDisabled`, `SoundBack`, `SoundNext` (empty = `SoundScroll`), `SoundExit` are sound event names. Own sounds go into the workshop addon (`sounds/pmm/*.wav` + `soundevents/soundevents_addon.vsndevts`, events `PMM.Menu.Select` / `Back` / `Next` / `Exit`); the server precaches the file through `"PrecacheResources": [ "soundevents/soundevents_addon.vsndevts" ]`. Plugins play the same sounds with `IMenuApi.PlayMenuSound(player, MenuSound.Click)` and read the names with `GetMenuSound(MenuSound)`.
+
+From 1.2.04 the core also opens menus of plugins built for schwarper's CS2MenuManager 1.0.43, such as cs2-store. Do not install schwarper's CS2MenuManager: on start the core writes its own `shared/CS2MenuManager/CS2MenuManager.dll` (`"CS2MenuManagerCompat": true`). Update `shared/MenuManagerApi` together with the core.
+
 Copy `Content-addonmanager` into the root of the MultiAddonManager client addon. Do not drop the files loose on the dedicated server. After a panorama update the player has to rejoin.
 
 Keep `"DefaultMenu": "PanoramaMenu"` or `"PanoramaWasdMenu"` in the config. Empty `PanoramaPosition` means center; `left` and `right` sit in the vertical middle. Menu colors are chosen in the constructor and installed with the client addon. Notifications stay on with `"Notifications": true`. A player on Panorama changes them, and the panel position, for themselves in `!menu`.
@@ -113,6 +125,16 @@ Put `MenuManagerApi.dll` in `shared/MenuManagerApi/`. Do not copy it into the pl
 С 1.1.11 папку `plugins/MenuManagerCore/runtimes` не удаляй. SQLite берёт оттуда `libe_sqlite3.so` или `e_sqlite3.dll` и пишет `menumanager.db` рядом с плагином.
 
 PlayerSettingsCS2 и AnyBaseLibCS2 не нужны. Этот форк сам хранит меню игрока.
+
+С 1.3.00 в релизе лежат три пустые заглушки: `plugins/PlayerSettings/PlayerSettings.dll`, `shared/PlayerSettingsApi/PlayerSettingsApi.dll`, `shared/AnyBaseLib/AnyBaseLib.dll`. CS2-SimpleAdmin и другие плагины под MenuManagerCS2 от NickFox проверяют эти файлы и без них выгружаются. `ISettingsApi` в заглушках нет. Если плагин реально вызывает `settings:nfcore`, поставь оригинальные PlayerSettingsCS2 и AnyBaseLibCS2 и не перезаписывай их заглушками.
+
+`"PanoramaLayoutPath"` (пусто = `panorama/layout/custom_game/menu_ui.xml`) и `IMenuApi.SetPanoramaHudLayout(path)` меняют файл панорамы. Файл один на весь сервер и должен сохранить id и классы `menu_ui.xml`.
+
+Цифры (1.3.00): CSGO Menu и `PanoramaDigitMenu` («Панорама (цифры)»: панорама без мыши, пункты 1–6, 8 назад, 9 далее, 0 выход) работают от биндов `css_1` … `css_0`. При выборе в `!menu` открывается проверка цифр: клавиши 1…0 загораются, когда сервер их получает, строка с биндами уходит в чат и консоль. Сервер не может прописать бинды игроку, игрок вставляет строку один раз:
+`spec_usenumberkeys_nobinds 0;bind "1" "css_1; slot1";…;bind "0" "css_0; slot10"` (пробел после `;` обязателен, так цифры работают и мёртвым).
+Другие плагины могут пользоваться теми же цифрами: `IMenuApi.GetNumberKeysBindLine()`, `PrintNumberKeysBinds(player)`, `HasNumberKeysChecked(player)`, `OpenNumberKeysCheck(player, onDone)` и событие `NumberKeyPressed(player, digit)`. `"NumberKeysTestTimeout": 40` в `MenuManagerCore.json`.
+
+Звуки меню (1.3.00): `SoundScroll`, `SoundClick`, `SoundDisabled`, `SoundBack`, `SoundNext` (пусто = `SoundScroll`), `SoundExit` — имена звуковых событий. Свои звуки кладутся в аддон мастерской (`sounds/pmm/*.wav` + `soundevents/soundevents_addon.vsndevts`, события `PMM.Menu.Select` / `Back` / `Next` / `Exit`); сервер прекэширует файл через `"PrecacheResources": [ "soundevents/soundevents_addon.vsndevts" ]`. Плагины играют те же звуки через `IMenuApi.PlayMenuSound(player, MenuSound.Click)` и читают имена через `GetMenuSound(MenuSound)`.
 
 `Content-addonmanager` копируется в корень клиентского аддона MultiAddonManager, не россыпью на dedicated server. После замены панорамы игрок заходит на сервер заново.
 

@@ -25,6 +25,53 @@ internal static class MenuOptionKind
         public Action<CCSPlayerController, ChatMenuOption, int>? OnSelect;
     }
 
+    public static string StateWord(bool on)
+    {
+        string key = on ? "menumanager.state_on" : "menumanager.state_off";
+        string word = Control.GetPlugin()?.Localizer[key] ?? "";
+        if (string.IsNullOrWhiteSpace(word) || word.StartsWith("menumanager.", StringComparison.Ordinal))
+        {
+            return on ? "Вкл" : "Выкл";
+        }
+
+        return word;
+    }
+
+    public static string WithState(string label, bool on)
+    {
+        return $"[{StateWord(on)}] {label}";
+    }
+
+    public static string WithoutState(string label)
+    {
+        if (label.Length < 4 || label[0] != '[')
+        {
+            return label;
+        }
+
+        int end = label.IndexOf(']');
+        if (end <= 1 || end + 1 >= label.Length || label[end + 1] != ' ')
+        {
+            return label;
+        }
+
+        string word = label[1..end];
+        if (!IsStateWord(word))
+        {
+            return label;
+        }
+
+        return label[(end + 2)..];
+    }
+
+    private static bool IsStateWord(string word)
+    {
+        return word.Equals(StateWord(true), StringComparison.OrdinalIgnoreCase) ||
+               word.Equals(StateWord(false), StringComparison.OrdinalIgnoreCase) ||
+               IsWord(word, OnWords) ||
+               IsWord(word, OffWords);
+    }
+
     public static void SetToggle(ChatMenuOption option, bool on)
     {
         if (Toggles.TryGetValue(option, out ToggleState? state))
