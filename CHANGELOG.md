@@ -4,6 +4,53 @@
 
 ## Ядро
 
+### 1.3.01
+
+- Панорама больше не перехватывает колесо мыши у чужих панелей (например, свой `!mvp`): у полноэкранных `utils-root` и `utils-theme`, а также у `utils-notify` и `utils-csgo` стоит `hittest="false"`. Клики по меню работают как раньше. Спасибо @sirow22 (SIROW [ECS]).
+- Изменился только клиентский аддон (`menu_ui.xml`): его нужно собрать и залить заново. Конфиг и API прежние, `shared/MenuManagerApi` можно не трогать.
+
+### 1.3.00
+
+- CSGO Menu мёртвым и в наблюдении. По умолчанию (`spec_usenumberkeys_nobinds 1`) игра у мёртвого не выполняет бинды цифр и переключает камеру. Ядро выдаёт в чат и консоль одну строку для копирования: `spec_usenumberkeys_nobinds 0;bind "1" "css_1; slot1";bind "2" "css_2; slot2";bind "3" "css_3; slot3";bind "4" "css_4; slot4";bind "5" "css_5; slot5";bind "6" "css_6; slot6";bind "7" "css_7; slot7";bind "8" "css_8; slot8";bind "9" "css_9; slot9";bind "0" "css_0; slot10"`. Пробел после `;` внутри бинда обязателен. Сервер не может прописать это сам: CS2 запрещает `bind`/`alias`/`spec_*` с сервера. Живым цифры по-прежнему берут оружие. На 0 теперь slot10 вместо несуществующего slot0. Проверено в игре.
+- CSGO Menu на панораме больше не вызывает пустую размытую плашку в центре экрана. Центр очищается, только если меню рисовалось текстом в центре (когда панорамы нет).
+- CSGO Menu выглядит как меню CS:GO: небольшая тёмная полупрозрачная подложка, текст с тенью, заголовок и строки-подсказки кремовые, пункты оранжевые, крупный Stratum2 Bold. Неактивный пункт — кремовый, как в CS:GO. Нет «Назад» или «Далее» — на их месте пустая строка, «0. Выход» не прыгает. Клавиши прежние: 1–7, 8 назад, 9 далее, 0 выход.
+- Проверка цифр (как в PMM_SimpleAdmin): при выборе CSGO Menu или «Панорама (цифры)» открывается панель с клавишами 1…0, они загораются, когда сервер получает `css_N`; полоса прогресса и «Нажато N / 10 · осталось». Строка с биндами — в чат и консоль. После всех десяти: 1 — включить меню, 2 — проверить ещё раз, 8 — назад, 0 — выход. До этого уже горящие 8 / 0 — назад / выход. Без нажатий `NumberKeysTestTimeout` (40 с) — возврат. В `!menu` для этих типов пункт «Проверка цифр». Результат сохраняется (колонка `number_keys_ok`).
+- Новый тип «Панорама (цифры)» (`PanoramaDigitMenu = 8`): та же панорама без мыши, у пунктов номера 1–6, 8 назад, 9 далее, 0 выход, подсказка внизу. Списки `AddSelect` открываются подменю. `GetMenuType` отдаёт `PanoramaMenu`, `GetSelectedMenu` — PanoramaDigitMenu.
+- API: `GetNumberKeysBindLine()`, `PrintNumberKeysBinds(player)`, `HasNumberKeysChecked(player)`, `OpenNumberKeysCheck(player, onDone)`, событие `NumberKeyPressed(player, digit)`. css_0…css_9 и menuselect теперь в одном месте (`NumberKeys.cs`).
+- Клиентский аддон изменился (`menu_ui.xml`, `ui.css`): его нужно собрать и залить заново. Конструктор (`assets.js`) обновлён.
+- Свои звуки меню: в клиентском аддоне sounds/pmm/*.wav и soundevents/soundevents_addon.vsndevts (события PMM.Menu.Select / Back / Next / Exit; Next пока играет звук Back). В MenuManagerCore.json новое поле "PrecacheResources" — список файлов, которые сервер прекэширует при загрузке карты. Имена событий ставятся в SoundClick / SoundBack / SoundNext / SoundExit. Новое поле SoundNext — звук «Далее» (пусто = SoundScroll, как раньше).
+- API звуков: `IMenuApi.PlayMenuSound(player, MenuSound)` играет звук меню из конфига ядра (учитывает выключенные звуки игрока и SoundVolume), `GetMenuSound(MenuSound)` отдаёт имя события. MenuSound: Scroll, Click, Disabled, Back, Next, Exit.
+- В `!menu` для типов со звуками (CSGO Menu, Панорама WASD и цифры, Центр WASD) переключатель «Звук меню» прямо в настройках вместо подменю «Настройки звука». Выключенный звук действует и на `PlayMenuSound` из API.
+- CS2-SimpleAdmin и другие плагины под MenuManagerCS2 от NickFox проверяют, что на сервере есть `plugins/PlayerSettings/PlayerSettings.dll`, `shared/PlayerSettingsApi/PlayerSettingsApi.dll` и `shared/AnyBaseLib/AnyBaseLib.dll`, и без них выгружаются. В архиве релиза теперь три заглушки с этими именами (`MenuManagerCore/Compat/NickFox`). Это пустые сборки: `ISettingsApi` и базы в них нет. Если плагин реально вызывает `settings:nfcore`, ставь оригинальные PlayerSettingsCS2 и AnyBaseLibCS2, ядру они не мешают.
+- `"PanoramaLayoutPath": ""` в `MenuManagerCore.json`. Пусто — `panorama/layout/custom_game/menu_ui.xml`. Свой файл должен сохранить id и классы `menu_ui.xml`.
+- `IMenuApi.SetPanoramaHudLayout(string path)` и `GetPanoramaHudLayout()`. Идея из PR #1 (srtnlgn). Layout один на сервер, побеждает последний вызов. Открытые панорамы закрываются, `custom_hud_layout` удаляется и создаётся заново с новым файлом. `null` или пустая строка возвращают стандартный путь.
+- `PisexMenusBridge` ищет HUD Pisex по стандартному `menu_ui.xml`, свой `PanoramaLayoutPath` на него не влияет.
+- Обнови `shared/MenuManagerApi` вместе с ядром.
+
+### 1.2.04
+
+- Ядро открывает меню плагинов, собранных под [CS2MenuManager](https://github.com/schwarper/CS2MenuManager) 1.0.43 от schwarper. Сделано под [cs2-store](https://github.com/schwarper/cs2-store) v33: магазин, инвентарь, покупка с подтверждением, экипировка, продажа, «Назад». Сам плагин не меняется и не пересобирается.
+- CS2MenuManager от schwarper больше не нужен. В `MenuManagerCore.dll` вшит маленький `CS2MenuManager.dll`. При старте ядро кладёт его в `shared/CS2MenuManager/`. Если там лежал оригинал, ядро сохраняет его как `CS2MenuManager.dll.original` и пишет об этом в лог.
+- Логика этих меню находится в ядре (`MenuCompat.cs`). Вшитая сборка только передаёт вызовы ядру через новый `IMenuCompatApi` (capability `menu:nfcore:compat`) в `MenuManagerApi`.
+- Тип меню берётся из `!menu` игрока. Поле `MenuType` в конфиге такого плагина ни на что не влияет. Пункт закрывает меню, открывает его заново или оставляет как есть: так же, как в CS2MenuManager. Если обработчик открыл следующее меню, оно и остаётся на экране.
+- `"CS2MenuManagerCompat": true` в `MenuManagerCore.json`. При `false` файл не пишется.
+- Обнови `shared/MenuManagerApi` вместе с ядром.
+- Если плагин успел загрузиться раньше ядра и упал с `Could not load file or assembly 'CS2MenuManager'`, перезапусти сервер ещё один раз. Это нужно только при первой установке.
+- Голосований `PanoramaVote` / `VoteManager` и `CS2MenuManager.toml` нет.
+
+### 1.2.03
+
+- Файл `configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json`. В нём у каждого плагина свои ключи и переводы. Пример заполнен для `CS2-SimpleAdmin` и `IksAdmin`. Код этих плагинов не меняется. Если файла нет, ядро создаёт этот пример. Уже существующий файл не перезаписывается.
+- `libe_sqlite3.so` для Linux больше не требует glibc 2.33. Берётся сборка SQLite 3.49.1, ей хватает glibc 2.28. На старом хосте ядро из-за `GLIBC_2.33 not found` больше не падает при старте.
+- Панорама: после клика по `AddToggle` тумблер обновляется на месте, без Close/Open меню (нет мигания и сброса страницы).
+- Панорама: после выбора в `AddSelect` текущее значение в строке обновляется сразу, меню остаётся открытым.
+- Эти правки UI нужны для VIPCore (тумблеры вкл/выкл, выпадающие FOV/Tag в `!vip`).
+
+### 1.2.02
+
+- Собрано под CounterStrikeSharp 1.0.376.
+- В `MenuManagerCore.json` поле `HudOpenDelay`, по умолчанию `0.2`. Это пауза перед показом обычной панорамы и CSGO Menu, чтобы команда в чате и HUD не попадали в один кадр. Локер WeaponPaints этой паузой не управляется: у него свой `OpenDelay`.
+
 ### 1.2.00
 
 - Тип меню `CsgoMenu`. Оранжевая панель: пункты 1–7, 8 назад, 9 далее, 0 выход. Команды `css_1`–`css_0` и `menuselect`, в чате запасные `!1`–`!0`. В `!menu` короткая подсказка и кнопка «Подробнее в чат»: одна строка бинда уходит в чат и в консоль клиента. Если возвращаться некуда, «8. Назад» серый и меню не закрывает. Позиция та же, что у панорамы: слева, центр или справа в `!menu`. Клиентский аддон нужно залить один раз.

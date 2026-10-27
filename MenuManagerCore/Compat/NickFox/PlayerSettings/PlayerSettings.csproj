@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- Stub plugin: CS2-SimpleAdmin checks that plugins/PlayerSettings/PlayerSettings.dll exists.
+         It registers nothing. Real plugin: PlayerSettingsCS2 by NickFox. -->
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>PlayerSettings</AssemblyName>
+        <RootNamespace>PlayerSettingsStub</RootNamespace>
+        <Deterministic>true</Deterministic>
+        <DebugType>none</DebugType>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CounterStrikeSharp.API" Version="1.0.376">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+</Project>
