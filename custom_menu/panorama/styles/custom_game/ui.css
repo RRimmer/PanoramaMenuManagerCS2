@@ -29,6 +29,8 @@
 	opacity: 1;
 	horizontal-align: center;
 	vertical-align: middle;
+	margin-left: 0px;
+	margin-right: 0px;
 	transform: scale3d(1, 1, 1);
 	transition-property: opacity, transform;
 	transition-duration: dur;
@@ -41,6 +43,28 @@
 {
 	opacity: 0;
 	transform: scale3d(0, 1, 1);
+}
+
+/* Position is switched by the plugin (pos-*). Without a class the menu keeps the start position above. */
+.utils-menu.pos-left
+{
+	horizontal-align: left;
+	margin-left: 40px;
+	margin-right: 0px;
+}
+
+.utils-menu.pos-center
+{
+	horizontal-align: center;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.utils-menu.pos-right
+{
+	horizontal-align: right;
+	margin-left: 0px;
+	margin-right: 40px;
 }
 
 .utils-bg
@@ -1064,6 +1088,125 @@
 	color: #ffffff;
 }
 
+/* ===== WASD mode (mode-wasd on the dialog) ===== */
+.utils-item-focus
+{
+	width: 4px;
+	height: 60%;
+	horizontal-align: left;
+	vertical-align: center;
+	background-color: accent;
+	border-radius: 2px;
+	visibility: collapse;
+}
+
+.utils-item.is-focus
+{
+	background-color: btn-bg-hover;
+}
+
+.utils-item.is-focus .utils-item-focus
+{
+	visibility: visible;
+}
+
+.utils-item.is-focus .utils-item-label
+{
+	color: #ffffff;
+}
+
+.utils-item.is-focus .utils-item-arrow
+{
+	wash-color: #ffffff;
+}
+
+.utils-item.is-disabled.is-focus
+{
+	background-color: rgba(6, 10, 16, 0.62);
+}
+
+.utils-item.is-disabled.is-focus .utils-item-label
+{
+	color: #aab6c4;
+}
+
+.utils-hint
+{
+	width: 100%;
+	horizontal-align: center;
+	text-align: center;
+	margin-top: 10px;
+	font-size: 13px;
+	letter-spacing: 1px;
+	color: label-color;
+	opacity: 0.85;
+	white-space: nowrap;
+	text-overflow: shrink;
+	visibility: collapse;
+}
+
+.utils-menu.mode-wasd .utils-hint
+{
+	visibility: visible;
+}
+
+.utils-menu.mode-wasd .utils-close-anchor,
+.utils-menu.mode-wasd .utils-back-anchor
+{
+	visibility: collapse;
+}
+
+/* A list that opens as a submenu (WASD, or more than 12 values): value + arrow to the right. */
+.utils-item.k-select.is-sub .utils-item-arrow
+{
+	transform: rotateZ(-90deg);
+	margin-right: 18px;
+	background-size: 12px 12px;
+}
+
+/* A row of that submenu. The current value gets a check mark. */
+.utils-item-check
+{
+	width: 16px;
+	height: 16px;
+	horizontal-align: right;
+	vertical-align: center;
+	margin-right: 18px;
+	overflow: noclip;
+	visibility: collapse;
+}
+
+.utils-check-a
+{
+	width: 6px;
+	height: 2px;
+	background-color: accent;
+	border-radius: 1px;
+	horizontal-align: left;
+	vertical-align: bottom;
+	margin-left: 1px;
+	margin-bottom: 4px;
+	transform: rotateZ(45deg);
+}
+
+.utils-check-b
+{
+	width: 12px;
+	height: 2px;
+	background-color: accent;
+	border-radius: 1px;
+	horizontal-align: left;
+	vertical-align: bottom;
+	margin-left: 4px;
+	margin-bottom: 6px;
+	transform: rotateZ(-50deg);
+}
+
+.utils-item.k-choice.is-picked .utils-item-check
+{
+	visibility: visible;
+}
+
 @define ntf-ok: #57e08a;
 @define ntf-warn: #ffcf5c;
 @define ntf-err: #ff5f6d;
@@ -1264,3 +1407,197 @@
 
 /* error */
 .utils-notify.ntf-error .ntf-bar { background-color: ntf-err; }
+
+/* ===== CSGO Menu (utils-csgo): CS:GO look on a small dark see-through backdrop ===== */
+/* Title and text lines cream, items orange, Stratum2 bold, text shadow. */
+.utils-csgo
+{
+	horizontal-align: left;
+	vertical-align: center;
+	flow-children: down;
+	margin-left: 24px;
+	padding: 14px 22px 16px 18px;
+	background-color: #140f0c9e;
+	opacity: 1;
+}
+
+.utils-csgo.csgo-hidden
+{
+	opacity: 0;
+	visibility: collapse;
+}
+
+.utils-csgo.pos-left
+{
+	horizontal-align: left;
+	margin-left: 24px;
+	margin-right: 0px;
+}
+
+.utils-csgo.pos-center
+{
+	horizontal-align: center;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.utils-csgo.pos-right
+{
+	horizontal-align: right;
+	margin-left: 0px;
+	margin-right: 40px;
+}
+
+.csgo-title
+{
+	color: #e9e4d0;
+	font-size: 25px;
+	letter-spacing: 0px;
+	margin-bottom: 26px;
+	text-shadow: 1px 1px 2px 2.0 #000000e6;
+}
+
+.csgo-row
+{
+	height: 31px;
+	color: #f0a63c;
+	font-size: 24px;
+	letter-spacing: 0px;
+	white-space: nowrap;
+	text-shadow: 1px 1px 2px 2.0 #000000e6;
+}
+
+/* Hidden item slot: no line at all. */
+.csgo-row.csgo-off
+{
+	visibility: collapse;
+}
+
+/* A line that is not a choice (disabled item, text): cream like CS:GO. */
+.csgo-row.csgo-disabled
+{
+	color: #e9e4d0;
+}
+
+/* A key that does nothing (no back, no next page): an empty line keeps 0 in its place. */
+.csgo-row.csgo-blank
+{
+	opacity: 0;
+}
+
+.csgo-gap
+{
+	height: 31px;
+}
+
+/* ----- number keys check (view-test): 1..0 light up, bar under them ----- */
+.csgo-test
+{
+	flow-children: down;
+	margin-bottom: 22px;
+	visibility: collapse;
+}
+
+.utils-csgo.view-test .csgo-test
+{
+	visibility: visible;
+}
+
+.csgo-keys
+{
+	flow-children: right;
+}
+
+.csgo-key
+{
+	width: 34px;
+	height: 34px;
+	margin-right: 6px;
+	padding-top: 5px;
+	text-align: center;
+	font-size: 19px;
+	color: #e9e4d0b3;
+	border: 2px solid #e9e4d066;
+	border-radius: 3px;
+	background-color: #0000004d;
+	text-shadow: 1px 1px 2px 2.0 #000000e6;
+}
+
+.csgo-key.ck-ok
+{
+	color: #1c1306;
+	border: 2px solid #f0a63c;
+	background-color: #f0a63c;
+}
+
+.csgo-pbar
+{
+	width: 394px;
+	height: 4px;
+	margin-top: 10px;
+	background-color: #e9e4d033;
+}
+
+.csgo-pfill
+{
+	width: 100%;
+	height: 100%;
+	background-color: #f0a63c;
+	clip: rect( 0%, 0%, 100%, 0% );
+}
+
+.csgo-pfill.p-0 { clip: rect( 0%, 0%, 100%, 0% ); }
+.csgo-pfill.p-1 { clip: rect( 0%, 10%, 100%, 0% ); }
+.csgo-pfill.p-2 { clip: rect( 0%, 20%, 100%, 0% ); }
+.csgo-pfill.p-3 { clip: rect( 0%, 30%, 100%, 0% ); }
+.csgo-pfill.p-4 { clip: rect( 0%, 40%, 100%, 0% ); }
+.csgo-pfill.p-5 { clip: rect( 0%, 50%, 100%, 0% ); }
+.csgo-pfill.p-6 { clip: rect( 0%, 60%, 100%, 0% ); }
+.csgo-pfill.p-7 { clip: rect( 0%, 70%, 100%, 0% ); }
+.csgo-pfill.p-8 { clip: rect( 0%, 80%, 100%, 0% ); }
+.csgo-pfill.p-9 { clip: rect( 0%, 90%, 100%, 0% ); }
+.csgo-pfill.p-10 { clip: rect( 0%, 100%, 100%, 0% ); }
+
+/* ===== Panorama (number keys): mode-digits on the dialog, no mouse ===== */
+.utils-item-num
+{
+	width: 22px;
+	horizontal-align: left;
+	vertical-align: center;
+	margin-left: 12px;
+	text-align: center;
+	font-size: 17px;
+	color: accent;
+	visibility: collapse;
+}
+
+.utils-menu.mode-digits .utils-item-num
+{
+	visibility: visible;
+}
+
+.utils-menu.mode-digits .utils-item.k-empty .utils-item-num
+{
+	visibility: collapse;
+}
+
+.utils-menu.mode-digits .utils-item.is-disabled .utils-item-num
+{
+	opacity: 0.4;
+}
+
+.utils-menu.mode-digits .utils-item-label
+{
+	margin-left: 42px;
+}
+
+.utils-menu.mode-digits .utils-hint
+{
+	visibility: visible;
+}
+
+.utils-menu.mode-digits .utils-close-anchor,
+.utils-menu.mode-digits .utils-back-anchor
+{
+	visibility: collapse;
+}
