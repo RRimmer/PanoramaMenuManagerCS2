@@ -7,6 +7,7 @@ Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **Rimm
 A panorama menu for Counter-Strike 2: a clickable dialog or the same dialog on WASD, switches, dropdowns and toasts. Other plugins open menus through `MenuManagerApi`.
 
 Current plugin version: ![Version](https://img.shields.io/github/v/release/RRimmer/PanoramaMenuManagerCS2?label=version&color=blue)
+![Downloads](https://img.shields.io/github/downloads/RRimmer/PanoramaMenuManagerCS2/total?style=for-the-badge&color=blue)
 
 ## Constructor site
 
