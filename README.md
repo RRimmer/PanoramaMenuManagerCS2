@@ -1,5 +1,7 @@
 # PanoramaMenuManagerCS2
 
+[![Boosty](https://img.shields.io/badge/Boosty-Support%20%2F%20%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-F15F2C?style=for-the-badge&logo=boosty&logoColor=white)](https://boosty.to/rimmerquinella)
+
 <h2><a href="https://genesis-cs.space/menuconstructor/index.html">>>>Более подробная информация на сайте<<<</a></h2>
 
 Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **Rimmer**. This build continues the [Stimayk](https://github.com/Stimayk/MenuManagerCS2) fork.
