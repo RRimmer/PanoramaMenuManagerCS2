@@ -153,7 +153,9 @@ internal static class Control
                         Utilities.SetStateChanged(player.Pawn.Value, "CBaseEntity", "m_MoveType");
                     }
 
-                    Menus.RemoveAt(i);
+                    // CloseMenu inside OnSelect may have removed it already. Remove it by
+                    // reference so the next player's menu stays in the list.
+                    _ = Menus.Remove(menu);
                     i--;
                     continue;
                 }

@@ -245,7 +245,8 @@ internal static class Misc
 
         player.PrintToChat($"{Control.GetPlugin()?.Localizer["menumanager.selected_type"]} {GetMenuTypeName(type)}");
         SaveSettingsAsync(steamId, settings);
-        CounterStrikeSharp.API.Modules.Menu.MenuManager.CloseActiveMenu(player);
+        // Also closes the Control and Metamod menus, not only the game's own menu.
+        Control.CloseMenu(player);
         PanoramaHud.CloseMenu(player);
         CsgoMenu.Close(player);
     }
