@@ -27,6 +27,8 @@ internal static class PanoramaHud
     // Kept outside SlotMenu: a WASD menu that reopens itself replaces its state,
     // and the player has to stay frozen across that.
     private static readonly bool[] Frozen = new bool[64];
+    // Mouse capture already sent to each player. Kept outside SlotMenu for the same reason.
+    private static readonly bool[] Captured = new bool[64];
     private static readonly int[] NoticeToken = new int[64];
     private static readonly string[] NoticeClasses = ["ntf-success", "ntf-warning", "ntf-error"];
 
@@ -37,6 +39,7 @@ internal static class PanoramaHud
         Array.Clear(PageMemory);
         Array.Clear(CursorMemory);
         Array.Clear(Frozen);
+        Array.Clear(Captured);
     }
 
     internal static bool SetLayoutPath(string? path, string source)
@@ -266,7 +269,7 @@ internal static class PanoramaHud
                     return;
                 }
 
-                _layout.SetInputCaptureEnabled(player, true);
+                SetCapture(player, true);
             });
         });
         return true;
@@ -968,8 +971,28 @@ internal static class PanoramaHud
             return false;
         }
 
+        // A new layout has not captured anyone yet.
         _layout = layout;
+        Array.Clear(Captured);
         return true;
+    }
+
+    // Turning capture on again moves the player's cursor, so a redraw only sends it
+    // when it is off. Turning it off is always sent.
+    private static void SetCapture(CCSPlayerController player, bool on)
+    {
+        if (_layout is not { IsValid: true } || player.Slot is < 0 or >= 64)
+        {
+            return;
+        }
+
+        if (on && Captured[player.Slot])
+        {
+            return;
+        }
+
+        Captured[player.Slot] = on;
+        _layout.SetInputCaptureEnabled(player, on);
     }
 
     private static void Draw(CCSPlayerController player, bool captureInput)
@@ -992,11 +1015,11 @@ internal static class PanoramaHud
         _layout.SetHasClassForPlayer(player, DialogId, "utils-dismissed", false);
         if (state.Wasd || state.Digits)
         {
-            _layout.SetInputCaptureEnabled(player, false);
+            SetCapture(player, false);
         }
         else if (captureInput)
         {
-            _layout.SetInputCaptureEnabled(player, true);
+            SetCapture(player, true);
         }
 
         _layout.SetDialogVariableStringForPlayer(player, "utils-desc", "desc", "");
@@ -1303,6 +1326,7 @@ internal static class PanoramaHud
             }
 
             Slots[player.Slot] = null;
+            Captured[player.Slot] = false;
         }
 
         if (_layout is not { IsValid: true })
@@ -1311,7 +1335,7 @@ internal static class PanoramaHud
         }
 
         _layout.SetHasClassForPlayer(player, DialogId, "utils-dismissed", true);
-        _layout.SetInputCaptureEnabled(player, false);
+        SetCapture(player, false);
         if (player.Slot is >= 0 and < 64 && Frozen[player.Slot])
         {
             Frozen[player.Slot] = false;
