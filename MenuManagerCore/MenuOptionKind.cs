@@ -12,6 +12,7 @@ internal static class MenuOptionKind
     private static readonly string[] OffWords = ["off", "выкл", "kapalı", "kapali"];
     private static readonly ConditionalWeakTable<ChatMenuOption, ToggleState> Toggles = new();
     private static readonly ConditionalWeakTable<ChatMenuOption, SelectState> Selects = new();
+    private static readonly ConditionalWeakTable<ChatMenuOption, object> Actions = new();
 
     private sealed class ToggleState
     {
@@ -70,6 +71,17 @@ internal static class MenuOptionKind
                word.Equals(StateWord(false), StringComparison.OrdinalIgnoreCase) ||
                IsWord(word, OnWords) ||
                IsWord(word, OffWords);
+    }
+
+    // Options from AddAction: they act straight away, so Panorama draws no submenu chevron
+    public static void SetAction(ChatMenuOption option)
+    {
+        Actions.AddOrUpdate(option, true);
+    }
+
+    public static bool IsAction(ChatMenuOption option)
+    {
+        return Actions.TryGetValue(option, out _);
     }
 
     public static void SetToggle(ChatMenuOption option, bool on)

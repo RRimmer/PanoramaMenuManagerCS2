@@ -41,6 +41,11 @@ public interface IMenuApi
     public ChatMenuOption AddSelect(IMenu menu, string label, string value, string[] choices,
         Action<CCSPlayerController, ChatMenuOption, int> onSelect, bool disabled = false);
 
+    // An option that does something straight away instead of opening another menu (a command, a vote, a map).
+    // Panorama draws it without the submenu chevron. Options from AddMenuOption keep the chevron, as before.
+    public ChatMenuOption AddAction(IMenu menu, string label,
+        Action<CCSPlayerController, ChatMenuOption> onSelect, bool disabled = false);
+
     public void Notify(CCSPlayerController player, string title, string text, MenuNotice notice = MenuNotice.Success);
 
     // ---- Number keys (1.3.00) ----

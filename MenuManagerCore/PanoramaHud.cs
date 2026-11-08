@@ -18,7 +18,7 @@ internal static class PanoramaHud
     private const string DialogId = "utils-dialog";
     private const int ItemsPerPage = 6;
     private const int MaxSelectOptions = 12;
-    private static readonly string[] ItemKinds = ["k-empty", "k-value", "k-submenu", "k-toggle", "k-select", "k-choice"];
+    private static readonly string[] ItemKinds = ["k-empty", "k-value", "k-submenu", "k-action", "k-toggle", "k-select", "k-choice"];
     private static readonly string[] Positions = ["left", "center", "right"];
     private static CCSCustomHudLayout? _layout;
     private static readonly SlotMenu?[] Slots = new SlotMenu?[64];
@@ -1049,7 +1049,8 @@ internal static class PanoramaHud
             string raw = option.Text ?? "";
             bool linked = raw.Contains(MenuOptionKind.ButtonMark);
             string visible = MenuOptionKind.WithoutState(VisibleText(raw));
-            string kind = "k-submenu";
+            // A plain option opens a submenu (chevron); one from AddAction acts straight away (no chevron)
+            string kind = MenuOptionKind.IsAction(option) ? "k-action" : "k-submenu";
             bool on = false;
             bool dropdown = false;
             string label = visible;
