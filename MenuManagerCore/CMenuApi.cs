@@ -84,6 +84,14 @@ internal class CMenuApi : IMenuApi
         return option;
     }
 
+    public ChatMenuOption AddAction(IMenu menu, string label,
+        Action<CCSPlayerController, ChatMenuOption> onSelect, bool disabled = false)
+    {
+        ChatMenuOption option = menu.AddMenuOption(label, onSelect, disabled);
+        MenuOptionKind.SetAction(option);
+        return option;
+    }
+
     public void Notify(CCSPlayerController player, string title, string text, MenuNotice notice = MenuNotice.Success)
     {
         PanoramaHud.Notify(player, title, text, notice);
