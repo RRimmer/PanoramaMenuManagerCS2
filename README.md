@@ -7,6 +7,7 @@
 <a href="https://genesis-cs.space/menuconstructor/menumanager/plugins/">
   <img src="images/PMMPlugins.jpg" alt="PMM MenuManager — many plugins in one place">
 </a>
+
 Fork of [MenuManagerCS2](https://github.com/NickFox007/MenuManagerCS2) by **Rimmer**. This build continues the [Stimayk](https://github.com/Stimayk/MenuManagerCS2) fork.
 
 A panorama menu for Counter-Strike 2: a clickable dialog or the same dialog on WASD, switches, dropdowns and toasts. Other plugins open menus through `MenuManagerApi`.
